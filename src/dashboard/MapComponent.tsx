@@ -1,82 +1,81 @@
-import React, { useEffect, useRef } from 'react';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import 'leaflet.heat';
-import { MapContainer } from './DashboardStyles';
+import React, { useEffect, useRef } from "react";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import "leaflet.heat";
+import { MapContainer } from "./DashboardStyles";
 
 interface MapProps {
-  lat: number;
-  lon: number;
-  zoom: number;
-  points: Array<{ lat: number; lng: number; intensity: number }>;
+	lat: number;
+	lon: number;
+	zoom: number;
+	points: Array<{ lat: number; lng: number; intensity: number }>;
 }
 
-const MapComponent: React.FC<MapProps> = React.memo(({ lat, lon, zoom, points }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const heatLayerRef = useRef<L.HeatLayer | null>(null);
+const MapComponent: React.FC<MapProps> = React.memo(
+	({ lat, lon, zoom, points }) => {
+		const mapContainerRef = useRef<HTMLDivElement>(null);
+		const mapRef = useRef<L.Map | null>(null);
+		const heatLayerRef = useRef<L.HeatLayer | null>(null);
 
-  useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current) {
-      // Initialize the map and add a tile layer
-      mapRef.current = L.map(mapContainerRef.current, {
-        center: [lat, lon],
-        zoom: zoom,
-      });
+		// ✅ 1. Initialize map ONCE
+		useEffect(() => {
+			if (!mapContainerRef.current || mapRef.current) return;
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors',
-      }).addTo(mapRef.current);
-    }
-    // Handle window resize to prevent errors
-    const handleResize = () => {
-      if (mapRef.current) {
-        mapRef.current.invalidateSize();
-      }
-    };
+			mapRef.current = L.map(mapContainerRef.current, {
+				center: [lat, lon],
+				zoom
+			});
 
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [lat, lon, zoom]);
+			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				maxZoom: 19,
+				attribution: "© OpenStreetMap contributors"
+			}).addTo(mapRef.current);
 
-  useEffect(() => {
-    if (mapRef.current) {
-      // Remove existing heat layer if it exists
-      if (heatLayerRef.current) {
-        mapRef.current.removeLayer(heatLayerRef.current);
-      }
+			const handleResize = () => {
+				mapRef.current?.invalidateSize();
+			};
 
-      // Create a new heat layer with updated points and add it to the map
-      heatLayerRef.current = L.heatLayer(
-        points.map((point) => [point.lat, point.lng, point.intensity]),
-        {
-          radius: 30,
-          blur: 15,
-          maxZoom: 15,
-          gradient: { 0.4: 'blue', 0.65: 'lime', 1: 'red' },
-        }
-      );
+			window.addEventListener("resize", handleResize);
 
-      heatLayerRef.current.addTo(mapRef.current);
-    }
-  }, [points]); // Re-run this effect only when `points` changes
+			return () => {
+				window.removeEventListener("resize", handleResize);
+				mapRef.current?.remove();
+				mapRef.current = null;
+			};
+		}, []); // 👈 RUN ONCE
 
-  // Clean up map and heat layer on unmount
-  useEffect(() => {
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.off();
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
+		// ✅ 2. Move map when location changes
+		useEffect(() => {
+			if (mapRef.current) {
+				mapRef.current.setView([lat, lon], zoom, {
+					animate: true
+				});
+			}
+		}, [lat, lon, zoom]);
 
-  return <MapContainer ref={mapContainerRef} />;
-});
+		// ✅ 3. Update heat layer when points change
+		useEffect(() => {
+			if (!mapRef.current) return;
+
+			if (heatLayerRef.current) {
+				mapRef.current.removeLayer(heatLayerRef.current);
+			}
+
+			heatLayerRef.current = L.heatLayer(
+				points.map((p) => [p.lat, p.lng, p.intensity]),
+				{
+					radius: 30,
+					blur: 15,
+					maxZoom: 15,
+					gradient: { 0.4: "blue", 0.65: "lime", 1: "red" }
+				}
+			);
+
+			heatLayerRef.current.addTo(mapRef.current);
+		}, [points]);
+
+		return <MapContainer ref={mapContainerRef} />;
+	}
+);
 
 export default MapComponent;

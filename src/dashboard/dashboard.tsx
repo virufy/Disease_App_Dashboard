@@ -99,7 +99,22 @@ const genderTranslations = {
 const mean = 2.170383376216376;
 const stdDev = 2;
 
-const SiliconValleyCoordinates = { lat: 37.3382, lon: -121.8863 };
+const LOCATIONS = {
+	siliconValley: {
+		label: "Silicon Valley",
+		lat: 37.3382,
+		lon: -121.8863,
+		zoom: 10
+	},
+	dubai: {
+		label: "Dubai",
+		lat: 25.2048,
+		lon: 55.2708,
+		zoom: 10
+	}
+} as const;
+
+type LocationKey = keyof typeof LOCATIONS;
 
 type SymptomKey =
 	| "All"
@@ -253,6 +268,8 @@ const processGenderSicknessData = (healthData: HealthDataEntry[]) => {
 
 const Dashboard: React.FC = () => {
 	const [healthData, setHealthData] = useState<HealthDataEntry[]>([]);
+	const [selectedLocation, setSelectedLocation] =
+		useState<LocationKey>("siliconValley");
 	const [selectedSymptomsLeft, setSelectedSymptomsLeft] =
 		useState<SymptomKey>("covid");
 	const [selectedSymptomsRight, setSelectedSymptomsRight] =
@@ -261,8 +278,7 @@ const Dashboard: React.FC = () => {
 	const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ar" | "ja">(
 		"en"
 	);
-	const reconnectAttempts = useRef(0);
-	const retryStartTime = useRef<number | null>(null);
+
 	const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
 	const updateScreenSize = () => setIsDesktop(window.innerWidth > 768);
 
@@ -287,24 +303,22 @@ const Dashboard: React.FC = () => {
 
 		ws.current.onopen = () => {
 			console.log("WebSocket connection opened");
-			reconnectAttempts.current = 0;
-			retryStartTime.current = null;
 
+			// Send initial data immediately after connection
 			ws.current?.send(JSON.stringify({ action: "send_initial_data" }));
 		};
 
 		ws.current.onmessage = (event) => {
-			console.log("Message from Backend:", event);
-			console.log("Data from Backend:", event.data);
 			const data = JSON.parse(event.data);
-
-			if (data.message === "pong" || data.message === "Received") {
-				console.log("Ping response from server:", data.message);
+			console.log("WebSocket message received:", data);
+			if (data.message === "connected") {
+				console.log("WebSocket confirmed connection");
 			} else {
 				// Handle health data updates
-				const healthData = data as HealthDataEntry;
-				console.log(healthData);
-				setHealthData((prevData) => [...prevData, healthData]);
+				const healthDataEntry = data as HealthDataEntry;
+				if (healthDataEntry.Symptoms) {
+					setHealthData((prevData) => [...prevData, healthDataEntry]);
+				}
 			}
 		};
 
@@ -325,7 +339,7 @@ const Dashboard: React.FC = () => {
 		// Ping every 5 minutes to keep the connection alive
 		const pingInterval = setInterval(
 			() => {
-				if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+				if (ws.current?.readyState === WebSocket.OPEN) {
 					ws.current.send(JSON.stringify({ action: "ping", message: "ping" }));
 				}
 			},
@@ -482,27 +496,55 @@ const Dashboard: React.FC = () => {
 						</DropdownOption>
 					</SelectDropdown>
 				</SelectionContainer>
-				<a
-					href="https://virufy.org/en/"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<VirufyLogoPNG />
-				</a>
+				<div style={{}}>
+					<a
+						href="https://virufy.org/en/"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<VirufyLogoPNG />
+					</a>
+					<p style={{ textAlign: "center", fontWeight: "bold" }}>Test data</p>
+				</div>
 				<a href="/disease-app" target="_blank" rel="noopener noreferrer">
 					<QRCode />
 				</a>
+				<SelectionContainer
+					style={{
+						width: "140px",
+						right: "80px",
+						position: "absolute"
+					}}
+				>
+					<label style={{ fontSize: "14px", marginBottom: "4px" }}>
+						Location:
+					</label>
+					<SelectDropdown>
+						{(Object.keys(LOCATIONS) as LocationKey[]).map((key) => (
+							<DropdownOption
+								key={key}
+								onClick={() => setSelectedLocation(key)}
+								style={{
+									fontWeight: selectedLocation === key ? "bold" : "normal",
+									color: selectedLocation === key ? "#007bff" : "black"
+								}}
+							>
+								{LOCATIONS[key].label}
+							</DropdownOption>
+						))}
+					</SelectDropdown>
+				</SelectionContainer>
 			</HeaderContainer>
 			<HeatmapContainer>
 				<HeatmapCard>
 					<MapComponent
-						lat={SiliconValleyCoordinates.lat}
-						lon={SiliconValleyCoordinates.lon}
-						zoom={10}
+						lat={LOCATIONS[selectedLocation].lat}
+						lon={LOCATIONS[selectedLocation].lon}
+						zoom={LOCATIONS[selectedLocation].zoom}
 						points={healthData
 							.filter((entry) => {
 								if (selectedSymptomsLeft === "All") {
-									return !entry.Symptoms.includes("none"); // Include all entries without 'none'
+									return !entry.Symptoms.includes("none");
 								}
 								return entry.Symptoms.includes(selectedSymptomsLeft);
 							})
@@ -512,6 +554,7 @@ const Dashboard: React.FC = () => {
 								intensity: 10
 							}))}
 					/>
+
 					<SelectionContainer>
 						<label style={{ fontSize: "14px", marginBottom: "10px" }}>
 							{t.symptomsLabel}
@@ -539,13 +582,13 @@ const Dashboard: React.FC = () => {
 				{isDesktop && (
 					<HeatmapCard>
 						<MapComponent
-							lat={SiliconValleyCoordinates.lat}
-							lon={SiliconValleyCoordinates.lon}
-							zoom={10}
+							lat={LOCATIONS[selectedLocation].lat}
+							lon={LOCATIONS[selectedLocation].lon}
+							zoom={LOCATIONS[selectedLocation].zoom}
 							points={healthData
 								.filter((entry) => {
 									if (selectedSymptomsRight === "All") {
-										return !entry.Symptoms.includes("none"); // Include all entries without 'none'
+										return !entry.Symptoms.includes("none");
 									}
 									return entry.Symptoms.includes(selectedSymptomsRight);
 								})
@@ -555,6 +598,7 @@ const Dashboard: React.FC = () => {
 									intensity: 10
 								}))}
 						/>
+
 						<SelectionContainer>
 							<label style={{ fontSize: "14px", marginBottom: "10px" }}>
 								{t.symptomsLabel}
