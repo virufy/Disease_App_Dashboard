@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+[dir="rtl"] .dropdown-option::before {
+  margin-right: 5px;   /* adds space between bullet and text on the right side */
+  padding-left: 5px;    /* adjusts the left padding if needed */
+  /* you may also adjust other properties like margin-left, padding-right */
+}

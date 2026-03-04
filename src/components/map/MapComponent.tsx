@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.heat";
-import { MapContainer } from "./DashboardStyles";
+import { MapContainer } from "../../styles/DashboardStyles";
+
 
 interface MapProps {
 	lat: number;
