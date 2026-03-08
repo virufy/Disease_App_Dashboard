@@ -272,15 +272,10 @@ const Dashboard: React.FC = () => {
 		useState<LocationKey>("siliconValley");
 	const [selectedSymptomsLeft, setSelectedSymptomsLeft] =
 		useState<SymptomKey>("covid");
-	const [selectedSymptomsRight, setSelectedSymptomsRight] =
-		useState<SymptomKey>("cold");
 	const ws = useRef<WebSocket | null>(null);
 	const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ar" | "ja">(
 		"en"
 	);
-
-	const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
-	const updateScreenSize = () => setIsDesktop(window.innerWidth > 768);
 
 	const t = translations[selectedLanguage];
 	const tg = genderTranslations[selectedLanguage];
@@ -354,15 +349,6 @@ const Dashboard: React.FC = () => {
 
 	const handleSymptomSelectLeft = useCallback((symptom: SymptomKey) => {
 		setSelectedSymptomsLeft(symptom);
-	}, []);
-
-	const handleSymptomSelectRight = useCallback((symptom: SymptomKey) => {
-		setSelectedSymptomsRight(symptom);
-	}, []);
-
-	useEffect(() => {
-		window.addEventListener("resize", updateScreenSize);
-		return () => window.removeEventListener("resize", updateScreenSize);
 	}, []);
 
 	const handleLanguageChange = useCallback((language: "en" | "ar" | "ja") => {
@@ -579,51 +565,6 @@ const Dashboard: React.FC = () => {
 						</SelectDropdown>
 					</SelectionContainer>
 				</HeatmapCard>
-				{isDesktop && (
-					<HeatmapCard>
-						<MapComponent
-							lat={LOCATIONS[selectedLocation].lat}
-							lon={LOCATIONS[selectedLocation].lon}
-							zoom={LOCATIONS[selectedLocation].zoom}
-							points={healthData
-								.filter((entry) => {
-									if (selectedSymptomsRight === "All") {
-										return !entry.Symptoms.includes("none");
-									}
-									return entry.Symptoms.includes(selectedSymptomsRight);
-								})
-								.map((entry) => ({
-									lat: entry.latitude,
-									lng: entry.longitude,
-									intensity: 10
-								}))}
-						/>
-
-						<SelectionContainer>
-							<label style={{ fontSize: "14px", marginBottom: "10px" }}>
-								{t.symptomsLabel}
-							</label>
-							<SelectDropdown>
-								{symptomKeys.map((symptom: SymptomKey) => (
-									<DropdownOption
-										key={symptom}
-										onClick={() => handleSymptomSelectRight(symptom)}
-										style={{
-											fontWeight: selectedSymptomsRight.includes(symptom)
-												? "bold"
-												: "normal",
-											color: selectedSymptomsRight.includes(symptom)
-												? "#007bff"
-												: "black"
-										}}
-									>
-										{symptomsTranslations[selectedLanguage][symptom]}
-									</DropdownOption>
-								))}
-							</SelectDropdown>
-						</SelectionContainer>
-					</HeatmapCard>
-				)}
 			</HeatmapContainer>
 			<BottomCardsContainer>
 				<BottomCard>

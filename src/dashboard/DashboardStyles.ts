@@ -2,10 +2,6 @@ import styled from 'styled-components';
 import virufyLogo from '../virufyLogo.png';
 import qrCode from '../qrcode.png';
 
-interface HeatmapCardProps {
-  $hideOnMobile?: boolean;
-}
-
 export const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
@@ -68,8 +64,8 @@ export const HeatmapContainer = styled.div`
   }
 `;
 
-export const HeatmapCard = styled.div<HeatmapCardProps>`
-  width: 45vw; 
+export const HeatmapCard = styled.div`
+  width: 100%;
   height: 100%;
   min-height: 300px;
   min-width: 300px;
