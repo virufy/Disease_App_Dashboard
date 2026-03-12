@@ -1,0 +1,42 @@
+{
+  "menu": {
+    "language": "اللغة",
+    "testData": "بيانات تجريبية"
+  },
+  "languages": {
+    "english": "English",
+    "arabic": "العربية (Arabic)",
+    "japanese": "日本語 (Japanese)"
+  },
+  "symptoms": {
+    "All": "الكل 🔴",
+    "heavysmoker": "مدخن ثقيل 🚬",
+    "cold": "نزلة برد 🤒",
+    "influenza": "إنفلونزا 😷",
+    "covid": "كوفيد 🤧",
+    "sars": "سارس 🦠",
+    "rsv": "الفيروس المخلوي التنفسي 🏥"
+  },
+  "dashboard": {
+    "symptomsLabel": "الأعراض",
+    "ageTitle": "العمر",
+    "genderTitle": "الجنس",
+    "coughStatsTitle": "إحصائيات السعال",
+    "location": "الموقع",
+    "loadingSymptoms": "جاري تحميل الأعراض",
+    "locations": {
+      "siliconValley": "سيليكون فالي",
+      "dubai": "دبي"
+    }
+  },
+  "sicknessKeys": {
+    "sick": "مريض",
+    "notSick": "غير مريض"
+  },
+  "gender": {
+    "sickMale": "ذكر مريض",
+    "nonSickMale": "ذكر غير مريض",
+    "sickFemale": "أنثى مريضة",
+    "nonSickFemale": "أنثى غير مريضة"
+  }
+}

@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
-import virufyLogo from '../../assets/images/virufyLogo.png';
-import qrCode from '../../assets/images/qrcode.png';
+import virufyLogo from "../../assets/images/virufyLogo.png";
+import qrCode from "../../assets/images/qrcode.png";
 
 interface SubMenuProps {
   isOpen: boolean;
@@ -11,8 +11,8 @@ interface SubMenuItemProps {
 }
 
 export const SideMenuContainer = styled.div`
-  width: 240px;
-  min-width: 240px;
+  width: 12%;
+  min-width: 11%;
   background-color: #f8f9fa;
   border-right: 1px solid #dee2e6;
   padding: 24px 0 0 0; /* remove bottom padding – footer will provide it */
@@ -27,6 +27,13 @@ export const SideMenuContainer = styled.div`
   [dir="rtl"] & {
     border-right: none;
     border-left: 1px solid #e0e0e0;
+  }
+
+  @media (max-width: 600px) {
+    width: 60px;
+    min-width: 60px;
+    overflow: hidden;
+    // hide text, show icons only, etc.
   }
 `;
 
@@ -58,7 +65,7 @@ export const TestDataText = styled.p`
 export const MenuItem = styled.div`
   cursor: pointer;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 14px;
   color: #333333;
   padding-block: 8px;
   padding-inline: 24px;
@@ -94,7 +101,7 @@ export const SubMenu = styled.div<SubMenuProps>`
 export const SubMenuItem = styled.div<SubMenuItemProps>`
   padding: 8px 24px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   color: ${(props) => (props.active ? "#007bff" : "#333333")};
   background-color: ${(props) => (props.active ? "#f0f0f0" : "transparent")};
   transition: all 0.2s ease;
@@ -123,6 +130,7 @@ export const SubMenuItem = styled.div<SubMenuItemProps>`
 export const SideMenuFooter = styled.div`
   margin-top: auto;
   padding: 10px;
+  padding-bottom: 25px;
   display: flex;
   justify-content: center;
   border-top: 1px solid #e0e0e0;
@@ -138,9 +146,9 @@ export const QRLink = styled.a`
 `;
 
 export const QRCode = styled.img.attrs({
-  src: qrCode
+  src: qrCode,
 })`
-  max-width: 80px;        /* fits nicely in the footer */
+  max-width: 80px;
   max-height: 80px;
   width: auto;
   height: auto;
@@ -153,9 +161,8 @@ export const QRCode = styled.img.attrs({
   }
 `;
 
-
 export const VirufyLogoPNG = styled.img.attrs({
-  src: virufyLogo
+  src: virufyLogo,
 })`
   min-height: 35px;
   height: 4vh;

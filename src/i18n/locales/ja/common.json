@@ -1,0 +1,42 @@
+{
+  "menu": {
+    "language": "言語",
+    "testData": "テストデータ"
+  },
+  "languages": {
+    "english": "English",
+    "arabic": "العربية (Arabic)",
+    "japanese": "日本語 (Japanese)"
+  },
+  "symptoms": {
+    "All": "すべて 🔴",
+    "heavysmoker": "ヘビースモーカー 🚬",
+    "cold": "風邪 🤒",
+    "influenza": "インフルエンザ 😷",
+    "covid": "COVID 🤧",
+    "sars": "SARS 🦠",
+    "rsv": "RSV 🏥"
+  },
+  "dashboard": {
+    "symptomsLabel": "症状",
+    "ageTitle": "年齢",
+    "genderTitle": "性別",
+    "coughStatsTitle": "咳の統計",
+    "location": "場所",
+    "loadingSymptoms": "症状を読み込み中",
+    "locations": {
+      "siliconValley": "シリコンバレー",
+      "dubai": "ドバイ"
+    }
+  },
+  "sicknessKeys": {
+    "sick": "病気",
+    "notSick": "健康"
+  },
+  "gender": {
+    "sickMale": "病気の男性",
+    "nonSickMale": "健康な男性",
+    "sickFemale": "病気の女性",
+    "nonSickFemale": "健康な女性"
+  }
+}
