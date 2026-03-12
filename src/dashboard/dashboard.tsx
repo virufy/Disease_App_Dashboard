@@ -4,9 +4,15 @@ import {
 	DashboardContainer,
 	HeatmapContainer,
 	HeatmapCard,
-	BottomCardsContainer,
-	BottomCard,
 	VirufyLogoPNG,
+	MapSelectionPanel,
+	OverlayToggleButton,
+	GraphOverlayPanel,
+	OverlayHeader,
+	OverlayCardsStack,
+	OverlayChartCard,
+	OverlayChartTitle,
+	OverlayChartBody,
 	SelectionContainer,
 	SelectDropdown,
 	DropdownOption,
@@ -276,6 +282,7 @@ const Dashboard: React.FC = () => {
 	const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ar" | "ja">(
 		"en"
 	);
+	const [isGraphsOverlayOpen, setIsGraphsOverlayOpen] = useState(false);
 
 	const t = translations[selectedLanguage];
 	const tg = genderTranslations[selectedLanguage];
@@ -294,7 +301,19 @@ const Dashboard: React.FC = () => {
 
 	const connectWebSocket = useCallback(() => {
 		const websocketURL = process.env.REACT_APP_WEBSOCKET_URL || "";
-		ws.current = new WebSocket(websocketURL);
+		if (!websocketURL) {
+			console.warn(
+				"REACT_APP_WEBSOCKET_URL is not set; dashboard is running offline."
+			);
+			return;
+		}
+
+		try {
+			ws.current = new WebSocket(websocketURL);
+		} catch (error) {
+			console.error("Failed to initialize WebSocket:", error);
+			return;
+		}
 
 		ws.current.onopen = () => {
 			console.log("WebSocket connection opened");
@@ -541,7 +560,7 @@ const Dashboard: React.FC = () => {
 							}))}
 					/>
 
-					<SelectionContainer>
+					<MapSelectionPanel>
 						<label style={{ fontSize: "14px", marginBottom: "10px" }}>
 							{t.symptomsLabel}
 						</label>
@@ -563,116 +582,119 @@ const Dashboard: React.FC = () => {
 								</DropdownOption>
 							))}
 						</SelectDropdown>
-					</SelectionContainer>
+					</MapSelectionPanel>
+
+					<OverlayToggleButton
+						$expanded={isGraphsOverlayOpen}
+						onClick={() => setIsGraphsOverlayOpen((prev) => !prev)}
+						aria-expanded={isGraphsOverlayOpen}
+						aria-controls="dashboard-graphs-overlay"
+					>
+						{isGraphsOverlayOpen ? "Hide graphs" : "Show graphs"}
+					</OverlayToggleButton>
+
+					<GraphOverlayPanel
+						id="dashboard-graphs-overlay"
+						$expanded={isGraphsOverlayOpen}
+					>
+						<OverlayHeader>Dashboard Analytics</OverlayHeader>
+						<OverlayCardsStack>
+							<OverlayChartCard>
+								<OverlayChartTitle>{t.ageTitle}</OverlayChartTitle>
+								<OverlayChartBody>
+									<ResponsiveContainer width="100%" height="100%">
+										<BarChart data={sicknessData}>
+											<CartesianGrid strokeDasharray="3 3" />
+											<XAxis dataKey="ageGroup" />
+											<YAxis />
+											<Tooltip content={<CustomTooltipBar />} />
+											<Legend
+												formatter={(value) =>
+													value === "Sick"
+														? t.chartKeys.sick
+														: t.chartKeys.notSick
+												}
+											/>
+											<Bar
+												dataKey="Sick"
+												name={t.chartKeys.sick}
+												fill="#FF6B6B"
+											/>
+											<Bar
+												dataKey="NotSick"
+												name={t.chartKeys.notSick}
+												fill="#4ECDC4"
+											/>
+										</BarChart>
+									</ResponsiveContainer>
+								</OverlayChartBody>
+							</OverlayChartCard>
+
+							<OverlayChartCard>
+								<OverlayChartTitle>{t.genderTitle}</OverlayChartTitle>
+								<OverlayChartBody>
+									<ResponsiveContainer width="100%" height="100%">
+										<PieChart
+											margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+										>
+											<Pie
+												data={genderSicknessData}
+												dataKey="value"
+												nameKey="name"
+												cx="50%"
+												cy="50%"
+												outerRadius="100%"
+												fill="#8884d8"
+												labelLine={false}
+											>
+												{genderSicknessData.map((entry, index) => (
+													<Cell
+														key={`cell-${index}`}
+														fill={COLORS[index % COLORS.length]}
+													/>
+												))}
+											</Pie>
+											<Tooltip
+												content={
+													<CustomTooltipPie selectedLanguage={selectedLanguage} />
+												}
+											/>
+											<Legend
+												formatter={(value) => {
+													return value === "Sick Male"
+														? genderTranslations[selectedLanguage].sickMale
+														: value === "Non-Sick Male"
+															? genderTranslations[selectedLanguage]
+																	.nonSickMale
+															: value === "Sick Female"
+																? genderTranslations[selectedLanguage]
+																		.sickFemale
+																: genderTranslations[selectedLanguage]
+																		.nonSickFemale;
+												}}
+											/>
+										</PieChart>
+									</ResponsiveContainer>
+								</OverlayChartBody>
+							</OverlayChartCard>
+
+							<OverlayChartCard>
+								<OverlayChartTitle>{t.coughStatsTitle}</OverlayChartTitle>
+								<OverlayChartBody>
+									<DistanceMetricChart
+										mean={mean}
+										stdDev={stdDev}
+										distanceMetrics={distanceMetrics}
+										language={selectedLanguage}
+									/>
+								</OverlayChartBody>
+							</OverlayChartCard>
+						</OverlayCardsStack>
+					</GraphOverlayPanel>
 				</HeatmapCard>
 			</HeatmapContainer>
-			<BottomCardsContainer>
-				<BottomCard>
-					<div
-						style={{
-							marginLeft: "auto",
-							marginRight: "auto",
-							marginBottom: "10px",
-							height: "5%",
-							fontSize: "100%"
-						}}
-					>
-						{t.ageTitle}
-					</div>
-					<ResponsiveContainer width="100%" height="93%">
-						<BarChart data={sicknessData}>
-							<CartesianGrid strokeDasharray="3 3" />
-							<XAxis dataKey="ageGroup" />
-							<YAxis />
-							<Tooltip content={<CustomTooltipBar />} />
-							<Legend
-								formatter={(value) =>
-									value === "Sick" ? t.chartKeys.sick : t.chartKeys.notSick
-								}
-							/>
-							<Bar dataKey="Sick" name={t.chartKeys.sick} fill="#FF6B6B" />
-							<Bar
-								dataKey="NotSick"
-								name={t.chartKeys.notSick}
-								fill="#4ECDC4"
-							/>
-						</BarChart>
-					</ResponsiveContainer>
-				</BottomCard>
-				<BottomCard>
-					<div
-						style={{
-							marginLeft: "auto",
-							marginRight: "auto",
-							marginBottom: "10px",
-							height: "5%",
-							fontSize: "100%"
-						}}
-					>
-						{t.genderTitle}
-					</div>
-					<ResponsiveContainer width="100%" height="100%">
-						<PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-							{" "}
-							{/* Adds margin for label space */}
-							<Pie
-								data={genderSicknessData}
-								dataKey="value"
-								nameKey="name"
-								cx="50%"
-								cy="50%"
-								outerRadius="100%"
-								fill="#8884d8"
-								labelLine={false}
-							>
-								{genderSicknessData.map((entry, index) => (
-									<Cell
-										key={`cell-${index}`}
-										fill={COLORS[index % COLORS.length]}
-									/>
-								))}
-							</Pie>
-							<Tooltip
-								content={
-									<CustomTooltipPie selectedLanguage={selectedLanguage} />
-								}
-							/>
-							<Legend
-								formatter={(value) => {
-									return value === "Sick Male"
-										? genderTranslations[selectedLanguage].sickMale
-										: value === "Non-Sick Male"
-											? genderTranslations[selectedLanguage].nonSickMale
-											: value === "Sick Female"
-												? genderTranslations[selectedLanguage].sickFemale
-												: genderTranslations[selectedLanguage].nonSickFemale;
-								}}
-							/>
-						</PieChart>
-					</ResponsiveContainer>
-				</BottomCard>
-				<BottomCard>
-					<div
-						style={{
-							marginLeft: "auto",
-							marginRight: "auto",
-							marginBottom: "10px",
-							height: "5%",
-							fontSize: "100%"
-						}}
-					>
-						{t.coughStatsTitle}
-					</div>
-					<DistanceMetricChart
-						mean={mean}
-						stdDev={stdDev}
-						distanceMetrics={distanceMetrics}
-						language={selectedLanguage}
-					/>
-				</BottomCard>
-			</BottomCardsContainer>
-		</DashboardContainer>
-	);
-};
+			</DashboardContainer>
+		);
+	};
 
 export default Dashboard;
