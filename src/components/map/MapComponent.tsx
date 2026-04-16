@@ -2,39 +2,70 @@ import React, { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.heat";
-import { MapContainer } from "../../styles/DashboardStyles";
+
+export interface ClusterPoint {
+  lat: number;
+  lng: number;
+  count: number;
+  sickRate: number;
+  topSymptom: string;
+}
 
 interface MapProps {
   lat: number;
   lon: number;
   zoom: number;
   points: Array<{ lat: number; lng: number; intensity: number }>;
+  clusters: ClusterPoint[];
 }
 
+// Professional heatmap colour ramp — low density (indigo) → medium (cyan) →
+// approaching hot (amber) → peak (scarlet)
+const HEAT_GRADIENT = {
+  0.0: "rgba(79, 70, 229, 0)",   // transparent indigo at 0
+  0.25: "#4f46e5",               // indigo
+  0.5:  "#06b6d4",               // cyan
+  0.7:  "#fbbf24",               // amber
+  0.88: "#ef4444",               // red
+  1.0:  "#fef2f2",               // near-white at peak
+};
+
+const clusterColor = (sickRate: number) => {
+  if (sickRate >= 67) return "#ef4444";
+  if (sickRate >= 34) return "#f59e0b";
+  return "#10b981";
+};
+
 const MapComponent: React.FC<MapProps> = React.memo(
-  ({ lat, lon, zoom, points }) => {
+  ({ lat, lon, zoom, points, clusters }) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<L.Map | null>(null);
     const heatLayerRef = useRef<L.HeatLayer | null>(null);
+    const clusterLayerRef = useRef<L.LayerGroup | null>(null);
 
-    // ✅ 1. Initialize map ONCE
+    // ── 1. Initialise map once ─────────────────────────────────────────────
     useEffect(() => {
       if (!mapContainerRef.current || mapRef.current) return;
 
       mapRef.current = L.map(mapContainerRef.current, {
         center: [lat, lon],
         zoom,
+        zoomControl: true,
       });
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "© OpenStreetMap contributors",
-      }).addTo(mapRef.current);
+      // CartoDB Positron — clean light basemap, great heatmap contrast, no API key
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+            '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: "abcd",
+          maxZoom: 19,
+        },
+      ).addTo(mapRef.current);
 
-      const handleResize = () => {
-        mapRef.current?.invalidateSize();
-      };
-
+      const handleResize = () => mapRef.current?.invalidateSize();
       window.addEventListener("resize", handleResize);
 
       return () => {
@@ -42,18 +73,16 @@ const MapComponent: React.FC<MapProps> = React.memo(
         mapRef.current?.remove();
         mapRef.current = null;
       };
-    }, []); // 👈 RUN ONCE
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps -- intentional one-time init
 
-    // ✅ 2. Move map when location changes
+    // ── 2. Pan/zoom when location chip changes ────────────────────────────
     useEffect(() => {
       if (mapRef.current) {
-        mapRef.current.setView([lat, lon], zoom, {
-          animate: true,
-        });
+        mapRef.current.setView([lat, lon], zoom, { animate: true });
       }
     }, [lat, lon, zoom]);
 
-    // ✅ 3. Update heat layer when points change
+    // ── 3. Rebuild heat layer when data changes ───────────────────────────
     useEffect(() => {
       if (!mapRef.current) return;
 
@@ -64,15 +93,65 @@ const MapComponent: React.FC<MapProps> = React.memo(
       heatLayerRef.current = L.heatLayer(
         points.map((p) => [p.lat, p.lng, p.intensity]),
         {
-          radius: 30,
-          blur: 15,
+          radius: 38,
+          blur: 28,
           maxZoom: 15,
-          gradient: { 0.4: "blue", 0.65: "lime", 1: "red" },
+          gradient: HEAT_GRADIENT,
         },
       );
 
       heatLayerRef.current.addTo(mapRef.current);
     }, [points]);
+
+    // ── 4. Rebuild clickable cluster markers ──────────────────────────────
+    useEffect(() => {
+      if (!mapRef.current) return;
+
+      if (clusterLayerRef.current) {
+        mapRef.current.removeLayer(clusterLayerRef.current);
+      }
+
+      clusterLayerRef.current = L.layerGroup();
+
+      clusters.forEach((cluster) => {
+        // Scale marker radius logarithmically with case count
+        const radius = Math.max(9, Math.min(26, 7 + Math.log(cluster.count + 1) * 3.5));
+        const color = clusterColor(cluster.sickRate);
+
+        const marker = L.circleMarker([cluster.lat, cluster.lng], {
+          radius,
+          fillColor: color,
+          fillOpacity: 0.82,
+          color: "#ffffff",
+          weight: 2,
+        });
+
+        const symptomLabel =
+          cluster.topSymptom && cluster.topSymptom !== "none"
+            ? cluster.topSymptom
+            : "Healthy";
+
+        marker.bindPopup(
+          `<div style="font-family:'Inter',sans-serif;padding:10px 14px;min-width:140px">
+            <div style="font-weight:800;font-size:14px;color:#111827;margin-bottom:6px">
+              ${cluster.count} case${cluster.count !== 1 ? "s" : ""}
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:3px">
+              <span>Sick rate</span>
+              <b style="color:${color}">${cluster.sickRate}%</b>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280">
+              <span>Top symptom</span>
+              <b style="color:#374151">${symptomLabel}</b>
+            </div>
+          </div>`,
+        );
+
+        clusterLayerRef.current!.addLayer(marker);
+      });
+
+      clusterLayerRef.current.addTo(mapRef.current);
+    }, [clusters]);
 
     return (
       <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />

@@ -1,6 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Label,
+} from 'recharts';
 import { BottomCardsContainer, BottomCard } from '../../styles/DashboardStyles';
 import DistanceMetricChart from './DistanceMetricChart';
 import { COLORS, MEAN, STD_DEV } from '../../constants/dashboard';
@@ -12,12 +25,23 @@ interface BottomChartsProps {
   distanceMetrics: number[];
 }
 
-// Helper to map internal gender names to translation keys
 const genderKeyMap: Record<string, string> = {
   'Sick Male': 'sickMale',
   'Non-Sick Male': 'nonSickMale',
   'Sick Female': 'sickFemale',
   'Non-Sick Female': 'nonSickFemale',
+};
+
+const CHART_TITLE_STYLE: React.CSSProperties = {
+  fontSize: '10px',
+  fontWeight: 700,
+  color: '#6b7280',
+  letterSpacing: '0.6px',
+  textTransform: 'uppercase',
+  paddingBottom: '8px',
+  borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+  marginBottom: '8px',
+  flexShrink: 0,
 };
 
 const BottomCharts: React.FC<BottomChartsProps> = ({
@@ -29,14 +53,35 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
   const { t } = useTranslation();
   const isRTL = selectedLanguage === 'ar';
 
-  // Bar chart tooltip
+  // ── Sick / Healthy overview totals ───────────────────────────────────────
+  const totalSick = sicknessData.reduce((sum, d) => sum + d.Sick, 0);
+  const totalHealthy = sicknessData.reduce((sum, d) => sum + d.NotSick, 0);
+  const grandTotal = totalSick + totalHealthy;
+  const sickPct = grandTotal > 0 ? Math.round((totalSick / grandTotal) * 100) : 0;
+  const overviewData = [
+    { name: t('sicknessKeys.sick'), value: totalSick },
+    { name: t('sicknessKeys.notSick'), value: totalHealthy },
+  ];
+
+  // ── Bar chart tooltip ────────────────────────────────────────────────────
   const CustomTooltipBar = ({ payload, label, active }: any) => {
     if (active && payload?.length) {
       return (
-        <div style={{ backgroundColor: 'white', border: '1px solid #ccc', borderRadius: 5, padding: 10, boxShadow: '0 0 5px rgba(0,0,0,0.2)' }}>
-          <p style={{ margin: 0, fontWeight: 'bold' }}>{label}</p>
+        <div
+          style={{
+            background: '#fff',
+            border: '1px solid rgba(0,0,0,0.1)',
+            borderRadius: 8,
+            padding: '8px 12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            fontSize: 12,
+          }}
+        >
+          <p style={{ margin: '0 0 4px', fontWeight: 600, color: '#374151' }}>
+            {label}
+          </p>
           {payload.map((entry: any, idx: number) => (
-            <p key={idx} style={{ margin: '5px 0', color: entry.color }}>
+            <p key={idx} style={{ margin: '2px 0', color: entry.color }}>
               {`${entry.name === 'Sick' ? t('sicknessKeys.sick') : t('sicknessKeys.notSick')}: ${entry.value}`}
             </p>
           ))}
@@ -46,37 +91,52 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
     return null;
   };
 
-  // Pie chart tooltip
+  // ── Pie chart tooltip ────────────────────────────────────────────────────
   const CustomTooltipPie = ({ payload, active }: any) => {
     if (active && payload?.length) {
       const { name, value } = payload[0];
       const key = genderKeyMap[name] || name;
       const localizedName = t(`gender.${key}`);
       return (
-        <div style={{
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          borderRadius: 5,
-          padding: 10,
-          boxShadow: '0 0 5px rgba(0,0,0,0.2)',
-          textAlign: isRTL ? 'right' : 'left',
-          direction: isRTL ? 'rtl' : 'ltr',
-        }}>
-          <p style={{ margin: 0 }}>{`${localizedName}: ${value.toFixed(2)}%`}</p>
+        <div
+          style={{
+            background: '#fff',
+            border: '1px solid rgba(0,0,0,0.1)',
+            borderRadius: 8,
+            padding: '8px 12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            fontSize: 12,
+            textAlign: isRTL ? 'right' : 'left',
+            direction: isRTL ? 'rtl' : 'ltr',
+          }}
+        >
+          <p style={{ margin: 0, color: '#374151' }}>
+            {`${localizedName}: ${value.toFixed(2)}%`}
+          </p>
         </div>
       );
     }
     return null;
   };
 
-  // Y‑axis tick renderer (same as before)
+  // ── Y-axis tick ──────────────────────────────────────────────────────────
   const renderYAxisTick = (props: any) => {
     const { x, y, payload } = props;
     const dx = isRTL ? 0 : -10;
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dx={dx} dy={4} textAnchor={isRTL ? 'end' : 'start'} fill="#666">
-          {Number.isInteger(payload.value) ? payload.value : payload.value.toFixed(0)}
+        <text
+          x={0}
+          y={0}
+          dx={dx}
+          dy={4}
+          textAnchor={isRTL ? 'end' : 'start'}
+          fill="#9ca3af"
+          fontSize={10}
+        >
+          {Number.isInteger(payload.value)
+            ? payload.value
+            : payload.value.toFixed(0)}
         </text>
       </g>
     );
@@ -84,79 +144,178 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
 
   return (
     <BottomCardsContainer>
-      {/* Age Chart */}
-      <BottomCard>
-        <div style={{ margin: '0 auto 10px', height: '5%', fontSize: '14px', fontWeight: 500 }}>
-          {t('dashboard.ageTitle')}
-        </div>
-        <ResponsiveContainer width="100%" height="93%">
-          <BarChart data={isRTL ? [...sicknessData].reverse() : sicknessData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="ageGroup" />
-            <YAxis
-              orientation={isRTL ? 'right' : 'left'}
-              tickFormatter={(v) => (Number.isInteger(v) ? v.toString() : v.toFixed(0))}
-              allowDecimals={false}
-              domain={[0, 'auto']}
-              tick={renderYAxisTick}
-            />
-            <Tooltip content={<CustomTooltipBar />} />
-            <Legend
-              wrapperStyle={{ fontSize: isRTL ? '14px' : '12px' }}
-              formatter={(value) => (isRTL ? `  ${value}  ` : value)}
-            />
-            <Bar dataKey="Sick" name={t('sicknessKeys.sick')} fill="#FF6B6B" />
-            <Bar dataKey="NotSick" name={t('sicknessKeys.notSick')} fill="#4ECDC4" />
-          </BarChart>
-        </ResponsiveContainer>
-      </BottomCard>
-
-      {/* Gender Chart */}
-      <BottomCard>
-        <div style={{ margin: '0 auto 10px', height: '5%', fontSize: '14px', fontWeight: 500  }}>
-          {t('dashboard.genderTitle')}
-        </div>
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-            <Pie
-              data={genderSicknessData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius="80%"
-              fill="#8884d8"
-              labelLine={false}
+      {/* ── Age Chart ─────────────────────────────────────────────────── */}
+      <BottomCard $accent="#3b82f6">
+        <div style={CHART_TITLE_STYLE}>{t('dashboard.ageTitle')}</div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={isRTL ? [...sicknessData].reverse() : sicknessData}
+              margin={{ top: 4, right: 4, left: -10, bottom: 0 }}
             >
-              {genderSicknessData.map((entry, idx) => (
-                <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltipPie />} />
-            <Legend
-              iconSize={14}
-              wrapperStyle={{ fontSize: isRTL ? '14px' : '12px', direction: isRTL ? 'rtl' : 'ltr' }}
-              formatter={(value) => {
-                const key = genderKeyMap[value] || value;
-                const translated = t(`gender.${key}`);
-                return isRTL ? `‎‎  ${translated}  ‎‎` : translated;
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgba(0,0,0,0.06)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="ageGroup"
+                tick={{ fontSize: 10, fill: '#9ca3af' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                orientation={isRTL ? 'right' : 'left'}
+                tickFormatter={(v) =>
+                  Number.isInteger(v) ? v.toString() : v.toFixed(0)
+                }
+                allowDecimals={false}
+                domain={[0, 'auto']}
+                tick={renderYAxisTick}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip content={<CustomTooltipBar />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+              <Legend
+                wrapperStyle={{ fontSize: 11, color: '#6b7280' }}
+                formatter={(value) => (isRTL ? `  ${value}  ` : value)}
+              />
+              <Bar
+                dataKey="Sick"
+                name={t('sicknessKeys.sick')}
+                fill="#ef4444"
+                radius={[3, 3, 0, 0]}
+              />
+              <Bar
+                dataKey="NotSick"
+                name={t('sicknessKeys.notSick')}
+                fill="#10b981"
+                radius={[3, 3, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </BottomCard>
 
-      {/* Cough Statistics Chart */}
-      <BottomCard>
-        <div style={{ margin: '0 auto 10px', height: '4%', fontSize: '14px', fontWeight: 500  }}>
-          {t('dashboard.coughStatsTitle')}
+      {/* ── Gender Chart ──────────────────────────────────────────────── */}
+      <BottomCard $accent="#8b5cf6">
+        <div style={CHART_TITLE_STYLE}>{t('dashboard.genderTitle')}</div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={genderSicknessData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius="75%"
+                labelLine={false}
+              >
+                {genderSicknessData.map((_, idx) => (
+                  <Cell
+                    key={`cell-${idx}`}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltipPie />} />
+              <Legend
+                iconSize={10}
+                wrapperStyle={{
+                  fontSize: 11,
+                  color: '#6b7280',
+                  direction: isRTL ? 'rtl' : 'ltr',
+                }}
+                formatter={(value) => {
+                  const key = genderKeyMap[value] || value;
+                  const translated = t(`gender.${key}`);
+                  return isRTL ? `\u200E  ${translated}  \u200E` : translated;
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-        <DistanceMetricChart
-          mean={MEAN}
-          stdDev={STD_DEV}
-          distanceMetrics={distanceMetrics}
-          language={selectedLanguage}
-        />
+      </BottomCard>
+
+      {/* ── Cough Statistics Chart ────────────────────────────────────── */}
+      <BottomCard $accent="#f59e0b">
+        <div style={CHART_TITLE_STYLE}>{t('dashboard.coughStatsTitle')}</div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <DistanceMetricChart
+            mean={MEAN}
+            stdDev={STD_DEV}
+            distanceMetrics={distanceMetrics}
+            language={selectedLanguage}
+          />
+        </div>
+      </BottomCard>
+      {/* ── Sick / Healthy Overview ───────────────────────────────────── */}
+      <BottomCard $accent="#ef4444">
+        <div style={CHART_TITLE_STYLE}>{t('dashboard.overviewTitle')}</div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={overviewData}
+                dataKey="value"
+                cx="50%"
+                cy="45%"
+                innerRadius="38%"
+                outerRadius="65%"
+                labelLine={false}
+                startAngle={90}
+                endAngle={-270}
+              >
+                <Label
+                  position="center"
+                  content={({ viewBox }) => {
+                    const { cx, cy } = viewBox as { cx: number; cy: number };
+                    return (
+                      <g>
+                        <text
+                          x={cx}
+                          y={cy - 4}
+                          textAnchor="middle"
+                          fill="#111827"
+                          style={{ fontSize: 18, fontWeight: 800 }}
+                        >
+                          {sickPct}%
+                        </text>
+                        <text
+                          x={cx}
+                          y={cy + 12}
+                          textAnchor="middle"
+                          fill="#9ca3af"
+                          style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.6 }}
+                        >
+                          SICK
+                        </text>
+                      </g>
+                    );
+                  }}
+                />
+                <Cell fill="#ef4444" />
+                <Cell fill="#10b981" />
+              </Pie>
+              <Tooltip
+                formatter={(value: number) => [value, '']}
+                contentStyle={{
+                  background: '#fff',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  borderRadius: 8,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  fontSize: 12,
+                }}
+              />
+              <Legend
+                iconSize={10}
+                wrapperStyle={{ fontSize: 11, color: '#6b7280' }}
+                formatter={(value) => isRTL ? `\u200E  ${value}  \u200E` : value}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </BottomCard>
     </BottomCardsContainer>
   );

@@ -3,27 +3,32 @@
     "language": "اللغة",
     "testData": "بيانات تجريبية"
   },
+  "sidebar": {
+    "total": "الإجمالي",
+    "filtered": "مُصفّى"
+  },
   "languages": {
     "english": "English",
     "arabic": "العربية (Arabic)",
     "japanese": "日本語 (Japanese)"
   },
   "symptoms": {
-    "All": "الكل 🔴",
-    "heavysmoker": "مدخن ثقيل 🚬",
-    "cold": "نزلة برد 🤒",
-    "influenza": "إنفلونزا 😷",
-    "covid": "كوفيد 🤧",
-    "sars": "سارس 🦠",
-    "rsv": "الفيروس المخلوي التنفسي 🏥"
+    "All": "الكل",
+    "heavysmoker": "مدخن ثقيل",
+    "cold": "نزلة برد",
+    "influenza": "إنفلونزا",
+    "covid": "كوفيد-19",
+    "sars": "سارس",
+    "rsv": "فيروس RSV"
   },
   "dashboard": {
     "symptomsLabel": "الأعراض",
-    "ageTitle": "العمر",
-    "genderTitle": "الجنس",
+    "ageTitle": "توزيع الأعمار",
+    "genderTitle": "التوزيع الجنسي",
     "coughStatsTitle": "إحصائيات السعال",
+    "overviewTitle": "مريض / بصحة جيدة",
     "location": "الموقع",
-    "loadingSymptoms": "جاري تحميل الأعراض",
+    "loadingSymptoms": "جارٍ التحميل...",
     "locations": {
       "siliconValley": "سيليكون فالي",
       "dubai": "دبي"
@@ -31,12 +36,12 @@
   },
   "sicknessKeys": {
     "sick": "مريض",
-    "notSick": "غير مريض"
+    "notSick": "بصحة جيدة"
   },
   "gender": {
     "sickMale": "ذكر مريض",
-    "nonSickMale": "ذكر غير مريض",
+    "nonSickMale": "ذكر بصحة جيدة",
     "sickFemale": "أنثى مريضة",
-    "nonSickFemale": "أنثى غير مريضة"
+    "nonSickFemale": "أنثى بصحة جيدة"
   }
 }

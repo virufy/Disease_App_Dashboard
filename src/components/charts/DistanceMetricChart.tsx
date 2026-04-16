@@ -40,14 +40,14 @@ const generateBellCurveData = (mean: number, stdDev: number) => {
 };
 
 const generateColor = (index: number, total: number) => {
-  if (index === total - 1) {
-    return 'rgba(255, 0, 0, 1)';
-  } else if (index === total - 2) {
-    return 'rgba(255, 0, 0, 0.4)';
-  } else {
-    const opacity = 0.1 + 0.3 * (index / total);
-    return `rgba(255, 0, 0, ${opacity})`;
-  }
+  // Gradient from indigo (low) through amber to red (high) — matches heatmap ramp
+  const palette = ['#4f46e5', '#06b6d4', '#fbbf24', '#ef4444'];
+  if (total <= 1) return palette[3];
+  const t = index / (total - 1);
+  if (t >= 0.75) return palette[3];
+  if (t >= 0.5)  return palette[2];
+  if (t >= 0.25) return palette[1];
+  return palette[0];
 };
 
 const CustomTooltip = ({ active, payload, label, language }: any) => {
@@ -59,16 +59,19 @@ const CustomTooltip = ({ active, payload, label, language }: any) => {
     return (
       <div
         style={{
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          padding: '5px',
+          background: '#fff',
+          border: '1px solid rgba(0,0,0,0.1)',
+          borderRadius: 8,
+          padding: '8px 12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          fontSize: 12,
           textAlign: isRTL ? 'right' : 'left',
           direction: isRTL ? 'rtl' : 'ltr',
         }}
       >
-        <p style={{ color: '#ff5632' }}>{`${t.tooltipDistance}: ${label.toFixed(2)}`}</p>
+        <p style={{ margin: '0 0 4px', color: '#ef4444', fontWeight: 500 }}>{`${t.tooltipDistance}: ${label.toFixed(2)}`}</p>
         {bellCurveValue && (
-          <p style={{ color: '#4BC0C0' }}>{`${t.tooltipProbability}: ${bellCurveValue.value.toFixed(4)}`}</p>
+          <p style={{ margin: 0, color: '#14b8a6' }}>{`${t.tooltipProbability}: ${bellCurveValue.value.toFixed(4)}`}</p>
         )}
       </div>
     );
@@ -98,7 +101,6 @@ const DistanceMetricChart: React.FC<DistanceMetricChartProps> = ({
 
   const renderCustomizedTick = (props: any) => {
     const { x, y, payload } = props;
-    const dx = isRTL ? 15 : 0;
     return (
       <g transform={`translate(${x},${y})`}>
         <text
@@ -107,7 +109,7 @@ const DistanceMetricChart: React.FC<DistanceMetricChartProps> = ({
           dy={16}
           dx={2}
           textAnchor="middle"
-          fill="#666"
+          fill="#9ca3af"
         >
           {payload.value.toFixed(2)}
         </text>
@@ -126,7 +128,7 @@ const renderYAxisTick = (props: any) => {
         dx={dx}
         dy={4}
         textAnchor={isRTL ? 'end' : 'start'}
-        fill="#666"
+        fill="#9ca3af"
       >
         {payload.value.toFixed(2)}
       </text>
@@ -135,16 +137,24 @@ const renderYAxisTick = (props: any) => {
 };
 
   return (
-    <ResponsiveContainer width="100%" height="93%">
+    <ResponsiveContainer width="100%" height="100%">
       <ComposedChart margin={chartMargin}>
         <XAxis
           dataKey="x"
-          label={{ value: t.distanceMetric, position: 'insideBottom', offset: -15, }}
+          label={{
+            value: t.distanceMetric,
+            position: 'insideBottom',
+            offset: -15,
+            fill: '#9ca3af',
+            fontSize: 10,
+          }}
           type="number"
           domain={['dataMin', 'dataMax']}
           ticks={ticks}
           tickFormatter={(value) => value.toFixed(2)}
           tick={renderCustomizedTick}
+          axisLine={false}
+          tickLine={false}
         />
         <YAxis
           orientation={isRTL ? 'right' : 'left'}
@@ -154,8 +164,12 @@ const renderYAxisTick = (props: any) => {
             position: isRTL ? 'insideRight' : 'insideLeft',
             offset: 0,
             dy: isRTL ? 40 : 60,
+            fill: '#9ca3af',
+            fontSize: 10,
           }}
           tick={renderYAxisTick}
+          axisLine={false}
+          tickLine={false}
         />
         <ZAxis range={[30, 31]} />
         <Tooltip content={<CustomTooltip language={language} />} />
@@ -164,8 +178,9 @@ const renderYAxisTick = (props: any) => {
           type="monotone"
           dataKey="y"
           data={bellCurveData}
-          fill="rgba(75, 192, 192, 0.2)"
-          stroke="#4BC0C0"
+          fill="rgba(6, 182, 212, 0.15)"
+          stroke="#06b6d4"
+          strokeWidth={2}
           name="Probability"
         />
 

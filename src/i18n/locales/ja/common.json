@@ -3,27 +3,32 @@
     "language": "言語",
     "testData": "テストデータ"
   },
+  "sidebar": {
+    "total": "合計",
+    "filtered": "絞り込み"
+  },
   "languages": {
     "english": "English",
     "arabic": "العربية (Arabic)",
     "japanese": "日本語 (Japanese)"
   },
   "symptoms": {
-    "All": "すべて 🔴",
-    "heavysmoker": "ヘビースモーカー 🚬",
-    "cold": "風邪 🤒",
-    "influenza": "インフルエンザ 😷",
-    "covid": "COVID 🤧",
-    "sars": "SARS 🦠",
-    "rsv": "RSV 🏥"
+    "All": "すべて",
+    "heavysmoker": "ヘビースモーカー",
+    "cold": "風邪",
+    "influenza": "インフルエンザ",
+    "covid": "COVID-19",
+    "sars": "SARS",
+    "rsv": "RSV"
   },
   "dashboard": {
     "symptomsLabel": "症状",
-    "ageTitle": "年齢",
-    "genderTitle": "性別",
+    "ageTitle": "年齢分布",
+    "genderTitle": "性別内訳",
     "coughStatsTitle": "咳の統計",
+    "overviewTitle": "病気 / 健康",
     "location": "場所",
-    "loadingSymptoms": "症状を読み込み中",
+    "loadingSymptoms": "読み込み中...",
     "locations": {
       "siliconValley": "シリコンバレー",
       "dubai": "ドバイ"
