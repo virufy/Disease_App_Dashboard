@@ -146,13 +146,19 @@ export const SelectDropdown = styled.div`
   border: 1px solid #ddd;
   padding: 10px;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
 `;
 
 export const DropdownOption = styled.div`
-  padding: 5px 0;
+  padding: 6px 8px;
   display: flex;
   align-items: center;
   cursor: pointer;
+  border-radius: 4px;
+  line-height: 1.3;
 
   &:hover {
     background-color: #e0e0e0;

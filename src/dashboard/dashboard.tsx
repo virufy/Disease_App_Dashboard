@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, {
+	useRef,
+	useEffect,
+	useState,
+	useCallback,
+	useMemo
+} from "react";
 import MapComponent from "./MapComponent";
 import {
 	DashboardContainer,
@@ -40,6 +46,7 @@ const translations = {
 	en: {
 		languageLabel: "Language:",
 		symptomsLabel: "Symptoms:",
+		clearFiltersLabel: "Clear filters",
 		ageTitle: "Age",
 		genderTitle: "Gender",
 		coughStatsTitle: "Cough Statistics",
@@ -51,6 +58,7 @@ const translations = {
 	ar: {
 		languageLabel: "اللغة:",
 		symptomsLabel: "الأعراض:",
+		clearFiltersLabel: "مسح الفلاتر",
 		ageTitle: "العمر",
 		genderTitle: "الجنس",
 		coughStatsTitle: "إحصائيات السعال",
@@ -62,6 +70,7 @@ const translations = {
 	ja: {
 		languageLabel: "言語:",
 		symptomsLabel: "症状:",
+		clearFiltersLabel: "フィルターをクリア",
 		ageTitle: "年齢",
 		genderTitle: "性別",
 		coughStatsTitle: "咳の統計",
@@ -125,6 +134,8 @@ type SymptomKey =
 	| "sars"
 	| "rsv";
 
+type SelectableSymptomKey = Exclude<SymptomKey, "All">;
+
 const symptoms: Record<SymptomKey, string> = {
 	All: "All 🔴",
 	heavysmoker: "Heavy Smoker 🚬",
@@ -137,7 +148,6 @@ const symptoms: Record<SymptomKey, string> = {
 
 // Extract keys for internal use
 const symptomKeys = Object.keys(symptoms) as SymptomKey[];
-
 const symptomsTranslations: Record<
 	"en" | "ar" | "ja",
 	Record<SymptomKey, string>
@@ -266,14 +276,57 @@ const processGenderSicknessData = (healthData: HealthDataEntry[]) => {
 	];
 };
 
+const toggleSymptomSelection = (
+	selectedSymptoms: SelectableSymptomKey[],
+	symptom: SymptomKey
+) => {
+	if (symptom === "All") {
+		return [];
+	}
+
+	return selectedSymptoms.includes(symptom)
+		? selectedSymptoms.filter((selectedSymptom) => selectedSymptom !== symptom)
+		: [...selectedSymptoms, symptom];
+};
+
+const isSymptomSelected = (
+	selectedSymptoms: SelectableSymptomKey[],
+	symptom: SymptomKey
+) => {
+	if (symptom === "All") {
+		return selectedSymptoms.length === 0;
+	}
+
+	return selectedSymptoms.includes(symptom);
+};
+
+const filterHealthDataBySymptoms = (
+	healthData: HealthDataEntry[],
+	selectedSymptoms: SelectableSymptomKey[]
+) =>
+	healthData.filter((entry) => {
+		// No explicit selection falls back to the same "All" behavior as before.
+		if (selectedSymptoms.length === 0) {
+			return !entry.Symptoms.includes("none");
+		}
+
+		// Multi-select uses OR matching so any selected symptom keeps the entry.
+		return selectedSymptoms.some((symptom) => entry.Symptoms.includes(symptom));
+	});
+
+const mergeSelectedSymptoms = (
+	leftSymptoms: SelectableSymptomKey[],
+	rightSymptoms: SelectableSymptomKey[]
+) => Array.from(new Set([...leftSymptoms, ...rightSymptoms]));
+
 const Dashboard: React.FC = () => {
 	const [healthData, setHealthData] = useState<HealthDataEntry[]>([]);
 	const [selectedLocation, setSelectedLocation] =
 		useState<LocationKey>("siliconValley");
 	const [selectedSymptomsLeft, setSelectedSymptomsLeft] =
-		useState<SymptomKey>("covid");
+		useState<SelectableSymptomKey[]>(["covid"]);
 	const [selectedSymptomsRight, setSelectedSymptomsRight] =
-		useState<SymptomKey>("cold");
+		useState<SelectableSymptomKey[]>(["cold"]);
 	const ws = useRef<WebSocket | null>(null);
 	const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ar" | "ja">(
 		"en"
@@ -284,16 +337,62 @@ const Dashboard: React.FC = () => {
 
 	const t = translations[selectedLanguage];
 	const tg = genderTranslations[selectedLanguage];
-
-	const sicknessData = processSicknessData(healthData);
-	const genderSicknessData = processGenderSicknessData(healthData) || [
-		{ name: "Sick Male", value: 0 },
-		{ name: "Non-Sick Male", value: 0 },
-		{ name: "Sick Female", value: 0 },
-		{ name: "Non-Sick Female", value: 0 }
-	];
-
-	const distanceMetrics = healthData.map((entry) => entry.DistanceMetric);
+	const filteredHealthDataLeft = useMemo(
+		() => filterHealthDataBySymptoms(healthData, selectedSymptomsLeft),
+		[healthData, selectedSymptomsLeft]
+	);
+	const filteredHealthDataRight = useMemo(
+		() => filterHealthDataBySymptoms(healthData, selectedSymptomsRight),
+		[healthData, selectedSymptomsRight]
+	);
+	const leftPoints = useMemo(
+		() =>
+			filteredHealthDataLeft.map((entry) => ({
+				lat: entry.latitude,
+				lng: entry.longitude,
+				intensity: 10
+			})),
+		[filteredHealthDataLeft]
+	);
+	const rightPoints = useMemo(
+		() =>
+			filteredHealthDataRight.map((entry) => ({
+				lat: entry.latitude,
+				lng: entry.longitude,
+				intensity: 10
+			})),
+		[filteredHealthDataRight]
+	);
+	const chartSelectedSymptoms = useMemo(
+		() =>
+			isDesktop
+				? mergeSelectedSymptoms(selectedSymptomsLeft, selectedSymptomsRight)
+				: selectedSymptomsLeft,
+		[isDesktop, selectedSymptomsLeft, selectedSymptomsRight]
+	);
+	const filteredHealthDataForCharts = useMemo(
+		() => filterHealthDataBySymptoms(healthData, chartSelectedSymptoms),
+		[healthData, chartSelectedSymptoms]
+	);
+	const sicknessData = useMemo(
+		() => processSicknessData(filteredHealthDataForCharts),
+		[filteredHealthDataForCharts]
+	);
+	const genderSicknessData = useMemo(
+		() =>
+			processGenderSicknessData(filteredHealthDataForCharts) || [
+				{ name: "Sick Male", value: 0 },
+				{ name: "Non-Sick Male", value: 0 },
+				{ name: "Sick Female", value: 0 },
+				{ name: "Non-Sick Female", value: 0 }
+			],
+		[filteredHealthDataForCharts]
+	);
+	const distanceMetrics = useMemo(
+		() =>
+			filteredHealthDataForCharts.map((entry) => entry.DistanceMetric),
+		[filteredHealthDataForCharts]
+	);
 
 	const COLORS = ["#FF6B6B", "#4ECDC4", "#1A535C", "#B565A7"];
 
@@ -353,11 +452,23 @@ const Dashboard: React.FC = () => {
 	}, [connectWebSocket]);
 
 	const handleSymptomSelectLeft = useCallback((symptom: SymptomKey) => {
-		setSelectedSymptomsLeft(symptom);
+		setSelectedSymptomsLeft((previousSymptoms) =>
+			toggleSymptomSelection(previousSymptoms, symptom)
+		);
 	}, []);
 
 	const handleSymptomSelectRight = useCallback((symptom: SymptomKey) => {
-		setSelectedSymptomsRight(symptom);
+		setSelectedSymptomsRight((previousSymptoms) =>
+			toggleSymptomSelection(previousSymptoms, symptom)
+		);
+	}, []);
+
+	const clearLeftSymptoms = useCallback(() => {
+		setSelectedSymptomsLeft([]);
+	}, []);
+
+	const clearRightSymptoms = useCallback(() => {
+		setSelectedSymptomsRight([]);
 	}, []);
 
 	useEffect(() => {
@@ -541,34 +652,40 @@ const Dashboard: React.FC = () => {
 						lat={LOCATIONS[selectedLocation].lat}
 						lon={LOCATIONS[selectedLocation].lon}
 						zoom={LOCATIONS[selectedLocation].zoom}
-						points={healthData
-							.filter((entry) => {
-								if (selectedSymptomsLeft === "All") {
-									return !entry.Symptoms.includes("none");
-								}
-								return entry.Symptoms.includes(selectedSymptomsLeft);
-							})
-							.map((entry) => ({
-								lat: entry.latitude,
-								lng: entry.longitude,
-								intensity: 10
-							}))}
+						points={leftPoints}
 					/>
 
 					<SelectionContainer>
 						<label style={{ fontSize: "14px", marginBottom: "10px" }}>
 							{t.symptomsLabel}
 						</label>
+						{selectedSymptomsLeft.length > 0 && (
+							<button
+								onClick={clearLeftSymptoms}
+								style={{
+									background: "none",
+									border: "none",
+									color: "#007bff",
+									cursor: "pointer",
+									fontSize: "12px",
+									marginBottom: "8px",
+									padding: 0
+								}}
+								type="button"
+							>
+								{t.clearFiltersLabel}
+							</button>
+						)}
 						<SelectDropdown>
 							{symptomKeys.map((symptom: SymptomKey) => (
 								<DropdownOption
 									key={symptom}
 									onClick={() => handleSymptomSelectLeft(symptom)}
 									style={{
-										fontWeight: selectedSymptomsLeft.includes(symptom)
+										fontWeight: isSymptomSelected(selectedSymptomsLeft, symptom)
 											? "bold"
 											: "normal",
-										color: selectedSymptomsLeft.includes(symptom)
+										color: isSymptomSelected(selectedSymptomsLeft, symptom)
 											? "#007bff"
 											: "black"
 									}}
@@ -585,34 +702,46 @@ const Dashboard: React.FC = () => {
 							lat={LOCATIONS[selectedLocation].lat}
 							lon={LOCATIONS[selectedLocation].lon}
 							zoom={LOCATIONS[selectedLocation].zoom}
-							points={healthData
-								.filter((entry) => {
-									if (selectedSymptomsRight === "All") {
-										return !entry.Symptoms.includes("none");
-									}
-									return entry.Symptoms.includes(selectedSymptomsRight);
-								})
-								.map((entry) => ({
-									lat: entry.latitude,
-									lng: entry.longitude,
-									intensity: 10
-								}))}
+							points={rightPoints}
 						/>
 
 						<SelectionContainer>
 							<label style={{ fontSize: "14px", marginBottom: "10px" }}>
 								{t.symptomsLabel}
 							</label>
+							{selectedSymptomsRight.length > 0 && (
+								<button
+									onClick={clearRightSymptoms}
+									style={{
+										background: "none",
+										border: "none",
+										color: "#007bff",
+										cursor: "pointer",
+										fontSize: "12px",
+										marginBottom: "8px",
+										padding: 0
+									}}
+									type="button"
+								>
+									{t.clearFiltersLabel}
+								</button>
+							)}
 							<SelectDropdown>
 								{symptomKeys.map((symptom: SymptomKey) => (
 									<DropdownOption
 										key={symptom}
 										onClick={() => handleSymptomSelectRight(symptom)}
 										style={{
-											fontWeight: selectedSymptomsRight.includes(symptom)
+											fontWeight: isSymptomSelected(
+												selectedSymptomsRight,
+												symptom
+											)
 												? "bold"
 												: "normal",
-											color: selectedSymptomsRight.includes(symptom)
+											color: isSymptomSelected(
+												selectedSymptomsRight,
+												symptom
+											)
 												? "#007bff"
 												: "black"
 										}}

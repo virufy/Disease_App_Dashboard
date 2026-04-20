@@ -16,14 +16,17 @@ const MapComponent: React.FC<MapProps> = React.memo(
 		const mapContainerRef = useRef<HTMLDivElement>(null);
 		const mapRef = useRef<L.Map | null>(null);
 		const heatLayerRef = useRef<L.HeatLayer | null>(null);
+		const initialViewRef = useRef({ lat, lon, zoom });
 
 		// ✅ 1. Initialize map ONCE
 		useEffect(() => {
 			if (!mapContainerRef.current || mapRef.current) return;
+			const { lat: initialLat, lon: initialLon, zoom: initialZoom } =
+				initialViewRef.current;
 
 			mapRef.current = L.map(mapContainerRef.current, {
-				center: [lat, lon],
-				zoom
+				center: [initialLat, initialLon],
+				zoom: initialZoom
 			});
 
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
