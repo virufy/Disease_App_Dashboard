@@ -314,84 +314,50 @@ const filterHealthDataBySymptoms = (
 		return selectedSymptoms.some((symptom) => entry.Symptoms.includes(symptom));
 	});
 
-const mergeSelectedSymptoms = (
-	leftSymptoms: SelectableSymptomKey[],
-	rightSymptoms: SelectableSymptomKey[]
-) => Array.from(new Set([...leftSymptoms, ...rightSymptoms]));
-
 const Dashboard: React.FC = () => {
 	const [healthData, setHealthData] = useState<HealthDataEntry[]>([]);
 	const [selectedLocation, setSelectedLocation] =
 		useState<LocationKey>("siliconValley");
-	const [selectedSymptomsLeft, setSelectedSymptomsLeft] =
-		useState<SelectableSymptomKey[]>(["covid"]);
-	const [selectedSymptomsRight, setSelectedSymptomsRight] =
-		useState<SelectableSymptomKey[]>(["cold"]);
+	const [selectedSymptoms, setSelectedSymptoms] = useState<
+		SelectableSymptomKey[]
+	>([]);
 	const ws = useRef<WebSocket | null>(null);
 	const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ar" | "ja">(
 		"en"
 	);
 
-	const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
-	const updateScreenSize = () => setIsDesktop(window.innerWidth > 768);
-
 	const t = translations[selectedLanguage];
 	const tg = genderTranslations[selectedLanguage];
-	const filteredHealthDataLeft = useMemo(
-		() => filterHealthDataBySymptoms(healthData, selectedSymptomsLeft),
-		[healthData, selectedSymptomsLeft]
+	const filteredHealthData = useMemo(
+		() => filterHealthDataBySymptoms(healthData, selectedSymptoms),
+		[healthData, selectedSymptoms]
 	);
-	const filteredHealthDataRight = useMemo(
-		() => filterHealthDataBySymptoms(healthData, selectedSymptomsRight),
-		[healthData, selectedSymptomsRight]
-	);
-	const leftPoints = useMemo(
+	const mapPoints = useMemo(
 		() =>
-			filteredHealthDataLeft.map((entry) => ({
+			filteredHealthData.map((entry) => ({
 				lat: entry.latitude,
 				lng: entry.longitude,
 				intensity: 10
 			})),
-		[filteredHealthDataLeft]
-	);
-	const rightPoints = useMemo(
-		() =>
-			filteredHealthDataRight.map((entry) => ({
-				lat: entry.latitude,
-				lng: entry.longitude,
-				intensity: 10
-			})),
-		[filteredHealthDataRight]
-	);
-	const chartSelectedSymptoms = useMemo(
-		() =>
-			isDesktop
-				? mergeSelectedSymptoms(selectedSymptomsLeft, selectedSymptomsRight)
-				: selectedSymptomsLeft,
-		[isDesktop, selectedSymptomsLeft, selectedSymptomsRight]
-	);
-	const filteredHealthDataForCharts = useMemo(
-		() => filterHealthDataBySymptoms(healthData, chartSelectedSymptoms),
-		[healthData, chartSelectedSymptoms]
+		[filteredHealthData]
 	);
 	const sicknessData = useMemo(
-		() => processSicknessData(filteredHealthDataForCharts),
-		[filteredHealthDataForCharts]
+		() => processSicknessData(filteredHealthData),
+		[filteredHealthData]
 	);
 	const genderSicknessData = useMemo(
 		() =>
-			processGenderSicknessData(filteredHealthDataForCharts) || [
+			processGenderSicknessData(filteredHealthData) || [
 				{ name: "Sick Male", value: 0 },
 				{ name: "Non-Sick Male", value: 0 },
 				{ name: "Sick Female", value: 0 },
 				{ name: "Non-Sick Female", value: 0 }
 			],
-		[filteredHealthDataForCharts]
+		[filteredHealthData]
 	);
 	const distanceMetrics = useMemo(
-		() =>
-			filteredHealthDataForCharts.map((entry) => entry.DistanceMetric),
-		[filteredHealthDataForCharts]
+		() => filteredHealthData.map((entry) => entry.DistanceMetric),
+		[filteredHealthData]
 	);
 
 	const COLORS = ["#FF6B6B", "#4ECDC4", "#1A535C", "#B565A7"];
@@ -451,29 +417,14 @@ const Dashboard: React.FC = () => {
 		};
 	}, [connectWebSocket]);
 
-	const handleSymptomSelectLeft = useCallback((symptom: SymptomKey) => {
-		setSelectedSymptomsLeft((previousSymptoms) =>
+	const handleSymptomSelect = useCallback((symptom: SymptomKey) => {
+		setSelectedSymptoms((previousSymptoms) =>
 			toggleSymptomSelection(previousSymptoms, symptom)
 		);
 	}, []);
 
-	const handleSymptomSelectRight = useCallback((symptom: SymptomKey) => {
-		setSelectedSymptomsRight((previousSymptoms) =>
-			toggleSymptomSelection(previousSymptoms, symptom)
-		);
-	}, []);
-
-	const clearLeftSymptoms = useCallback(() => {
-		setSelectedSymptomsLeft([]);
-	}, []);
-
-	const clearRightSymptoms = useCallback(() => {
-		setSelectedSymptomsRight([]);
-	}, []);
-
-	useEffect(() => {
-		window.addEventListener("resize", updateScreenSize);
-		return () => window.removeEventListener("resize", updateScreenSize);
+	const clearSymptoms = useCallback(() => {
+		setSelectedSymptoms([]);
 	}, []);
 
 	const handleLanguageChange = useCallback((language: "en" | "ar" | "ja") => {
@@ -554,10 +505,14 @@ const Dashboard: React.FC = () => {
 			<HeaderContainer style={{ marginBottom: "4px" }}>
 				<SelectionContainer
 					style={{
-						width: "60px",
+						width: "max-content",
+						minWidth: "132px",
+						maxWidth: "none",
+						flex: "0 0 auto",
 						left: "0",
 						position: "absolute",
-						paddingLeft: "0px"
+						paddingLeft: "0px",
+						overflow: "visible"
 					}}
 				>
 					<label
@@ -570,7 +525,14 @@ const Dashboard: React.FC = () => {
 						{t.languageLabel}
 					</label>
 					<SelectDropdown
-						style={{ padding: "4px", height: "100%", position: "relative" }}
+						style={{
+							width: "max-content",
+							minWidth: "100%",
+							padding: "6px 8px",
+							height: "100%",
+							position: "relative",
+							overflowX: "visible"
+						}}
 					>
 						<DropdownOption
 							key="en"
@@ -622,15 +584,26 @@ const Dashboard: React.FC = () => {
 				</a>
 				<SelectionContainer
 					style={{
-						width: "140px",
+						width: "max-content",
+						minWidth: "168px",
+						maxWidth: "none",
+						flex: "0 0 auto",
 						right: "80px",
-						position: "absolute"
+						position: "absolute",
+						overflow: "visible"
 					}}
 				>
 					<label style={{ fontSize: "14px", marginBottom: "4px" }}>
 						Location:
 					</label>
-					<SelectDropdown>
+					<SelectDropdown
+						style={{
+							width: "max-content",
+							minWidth: "100%",
+							padding: "8px 14px 8px 10px",
+							overflowX: "visible"
+						}}
+					>
 						{(Object.keys(LOCATIONS) as LocationKey[]).map((key) => (
 							<DropdownOption
 								key={key}
@@ -652,16 +625,16 @@ const Dashboard: React.FC = () => {
 						lat={LOCATIONS[selectedLocation].lat}
 						lon={LOCATIONS[selectedLocation].lon}
 						zoom={LOCATIONS[selectedLocation].zoom}
-						points={leftPoints}
+						points={mapPoints}
 					/>
 
 					<SelectionContainer>
 						<label style={{ fontSize: "14px", marginBottom: "10px" }}>
 							{t.symptomsLabel}
 						</label>
-						{selectedSymptomsLeft.length > 0 && (
+						{selectedSymptoms.length > 0 && (
 							<button
-								onClick={clearLeftSymptoms}
+								onClick={clearSymptoms}
 								style={{
 									background: "none",
 									border: "none",
@@ -680,12 +653,12 @@ const Dashboard: React.FC = () => {
 							{symptomKeys.map((symptom: SymptomKey) => (
 								<DropdownOption
 									key={symptom}
-									onClick={() => handleSymptomSelectLeft(symptom)}
+									onClick={() => handleSymptomSelect(symptom)}
 									style={{
-										fontWeight: isSymptomSelected(selectedSymptomsLeft, symptom)
+										fontWeight: isSymptomSelected(selectedSymptoms, symptom)
 											? "bold"
 											: "normal",
-										color: isSymptomSelected(selectedSymptomsLeft, symptom)
+										color: isSymptomSelected(selectedSymptoms, symptom)
 											? "#007bff"
 											: "black"
 									}}
@@ -696,63 +669,6 @@ const Dashboard: React.FC = () => {
 						</SelectDropdown>
 					</SelectionContainer>
 				</HeatmapCard>
-				{isDesktop && (
-					<HeatmapCard>
-						<MapComponent
-							lat={LOCATIONS[selectedLocation].lat}
-							lon={LOCATIONS[selectedLocation].lon}
-							zoom={LOCATIONS[selectedLocation].zoom}
-							points={rightPoints}
-						/>
-
-						<SelectionContainer>
-							<label style={{ fontSize: "14px", marginBottom: "10px" }}>
-								{t.symptomsLabel}
-							</label>
-							{selectedSymptomsRight.length > 0 && (
-								<button
-									onClick={clearRightSymptoms}
-									style={{
-										background: "none",
-										border: "none",
-										color: "#007bff",
-										cursor: "pointer",
-										fontSize: "12px",
-										marginBottom: "8px",
-										padding: 0
-									}}
-									type="button"
-								>
-									{t.clearFiltersLabel}
-								</button>
-							)}
-							<SelectDropdown>
-								{symptomKeys.map((symptom: SymptomKey) => (
-									<DropdownOption
-										key={symptom}
-										onClick={() => handleSymptomSelectRight(symptom)}
-										style={{
-											fontWeight: isSymptomSelected(
-												selectedSymptomsRight,
-												symptom
-											)
-												? "bold"
-												: "normal",
-											color: isSymptomSelected(
-												selectedSymptomsRight,
-												symptom
-											)
-												? "#007bff"
-												: "black"
-										}}
-									>
-										{symptomsTranslations[selectedLanguage][symptom]}
-									</DropdownOption>
-								))}
-							</SelectDropdown>
-						</SelectionContainer>
-					</HeatmapCard>
-				)}
 			</HeatmapContainer>
 			<BottomCardsContainer>
 				<BottomCard>

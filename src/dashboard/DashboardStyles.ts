@@ -57,10 +57,10 @@ export const HeatmapContainer = styled.div`
   display: flex;
   gap: 10px;
   height: 50%;
+  width: 100%;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    height: 500px;
+    height: auto;
     width: 90vw;
   }
   @media (max-height: 800px) {
@@ -69,7 +69,8 @@ export const HeatmapContainer = styled.div`
 `;
 
 export const HeatmapCard = styled.div<HeatmapCardProps>`
-  width: 45vw; 
+  width: 100%;
+  flex: 1;
   height: 100%;
   min-height: 300px;
   min-width: 300px;
@@ -77,11 +78,13 @@ export const HeatmapCard = styled.div<HeatmapCardProps>`
   border-radius: 12px;
   overflow: hidden;
   display: flex;
-  flex-direction: row;  /* Arrange items side by side */
+  flex-direction: row;
 
   @media (max-width: 768px) {
-    height: 500px;
+    flex-direction: column;
+    height: auto;
     width: 90vw;
+    min-width: 0;
   }
 `;
 
@@ -116,26 +119,35 @@ export const BottomCard = styled.div`
 `;
 
 export const MapContainer = styled.div`
-  width: 82%;
+  flex: 1 1 auto;
+  min-width: 0;
   height: 100%;
   border-radius: 12px;
   overflow: hidden;
   @media (max-width: 768px) {
-    width: 94%;
+    width: 100%;
+    min-height: 320px;
   }
 `;
 
 export const SelectionContainer = styled.div`
-  width: 13%;
-  min-width: 75px;
+  flex: 0 0 220px;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
   padding: 10px;
-  padding-right: 30px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
+  min-height: 0;
+  overflow: hidden;
   @media (max-width: 768px) {
-    width: 6%;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: 0 0 auto;
   }
 `;
 
@@ -150,6 +162,9 @@ export const SelectDropdown = styled.div`
   flex-direction: column;
   gap: 4px;
   box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 `;
 
 export const DropdownOption = styled.div`
@@ -159,6 +174,7 @@ export const DropdownOption = styled.div`
   cursor: pointer;
   border-radius: 4px;
   line-height: 1.3;
+  white-space: nowrap;
 
   &:hover {
     background-color: #e0e0e0;
