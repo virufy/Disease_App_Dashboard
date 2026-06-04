@@ -1,4 +1,5 @@
 import React from "react";
+import { tokens } from "../../styles/theme";
 
 const HeatmapLegend: React.FC = () => (
   <div
@@ -10,10 +11,10 @@ const HeatmapLegend: React.FC = () => (
       background: "rgba(255, 255, 255, 0.93)",
       backdropFilter: "blur(12px)",
       WebkitBackdropFilter: "blur(12px)",
-      border: "1px solid rgba(0, 0, 0, 0.08)",
-      borderRadius: "10px",
+      border: `1px solid ${tokens.color.borderSoft}`,
+      borderRadius: tokens.radius.md,
       padding: "8px 12px",
-      boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",
+      boxShadow: tokens.shadow.md,
       minWidth: "110px",
     }}
   >
@@ -23,7 +24,7 @@ const HeatmapLegend: React.FC = () => (
         fontWeight: 700,
         letterSpacing: "0.8px",
         textTransform: "uppercase",
-        color: "#6b7280",
+        color: tokens.color.muted,
         marginBottom: "6px",
       }}
     >
@@ -35,7 +36,7 @@ const HeatmapLegend: React.FC = () => (
         height: "8px",
         borderRadius: "4px",
         background:
-          "linear-gradient(to right, #4f46e5, #06b6d4, #fbbf24, #ef4444)",
+          "linear-gradient(to right, #0d9488, #06b6d4, #fbbf24, #ef4444)",
         marginBottom: "4px",
       }}
     />
@@ -46,10 +47,10 @@ const HeatmapLegend: React.FC = () => (
         width: "86px",
       }}
     >
-      <span style={{ fontSize: "9px", color: "#9ca3af", fontWeight: 500 }}>
+      <span style={{ fontSize: "9px", color: tokens.color.faint, fontWeight: 500 }}>
         Low
       </span>
-      <span style={{ fontSize: "9px", color: "#9ca3af", fontWeight: 500 }}>
+      <span style={{ fontSize: "9px", color: tokens.color.faint, fontWeight: 500 }}>
         High
       </span>
     </div>

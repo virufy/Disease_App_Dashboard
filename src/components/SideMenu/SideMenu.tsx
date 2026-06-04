@@ -147,21 +147,21 @@ const SideMenu: React.FC<SideMenuProps> = ({
           {isLangOpen ? <IoChevronUp size={13} /> : <IoChevronDown size={13} />}
         </MenuItem>
 
-        <SubMenu isOpen={isLangOpen}>
+        <SubMenu $isOpen={isLangOpen}>
           <SubMenuItem
-            active={i18n.language === "en"}
+            $active={i18n.language === "en"}
             onClick={() => changeLanguage("en")}
           >
             {t("languages.english")}
           </SubMenuItem>
           <SubMenuItem
-            active={i18n.language === "ja"}
+            $active={i18n.language === "ja"}
             onClick={() => changeLanguage("ja")}
           >
             {t("languages.japanese")}
           </SubMenuItem>
           <SubMenuItem
-            active={i18n.language === "ar"}
+            $active={i18n.language === "ar"}
             onClick={() => changeLanguage("ar")}
           >
             {t("languages.arabic")}

@@ -17,6 +17,7 @@ import {
 import { BottomCardsContainer, BottomCard } from '../../styles/DashboardStyles';
 import DistanceMetricChart from './DistanceMetricChart';
 import { COLORS, MEAN, STD_DEV } from '../../constants/dashboard';
+import { tokens } from '../../styles/theme';
 
 interface BottomChartsProps {
   selectedLanguage: 'en' | 'ar' | 'ja';
@@ -35,11 +36,11 @@ const genderKeyMap: Record<string, string> = {
 const CHART_TITLE_STYLE: React.CSSProperties = {
   fontSize: '10px',
   fontWeight: 700,
-  color: '#6b7280',
+  color: tokens.color.muted,
   letterSpacing: '0.6px',
   textTransform: 'uppercase',
   paddingBottom: '8px',
-  borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+  borderBottom: `1px solid ${tokens.color.borderSoft}`,
   marginBottom: '8px',
   flexShrink: 0,
 };
@@ -145,7 +146,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
   return (
     <BottomCardsContainer>
       {/* ── Age Chart ─────────────────────────────────────────────────── */}
-      <BottomCard $accent="#3b82f6">
+      <BottomCard $accent={tokens.color.brand}>
         <div style={CHART_TITLE_STYLE}>{t('dashboard.ageTitle')}</div>
         <div style={{ flex: 1, minHeight: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -183,13 +184,13 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
               <Bar
                 dataKey="Sick"
                 name={t('sicknessKeys.sick')}
-                fill="#ef4444"
+                fill={tokens.color.danger}
                 radius={[3, 3, 0, 0]}
               />
               <Bar
                 dataKey="NotSick"
                 name={t('sicknessKeys.notSick')}
-                fill="#10b981"
+                fill={tokens.color.success}
                 radius={[3, 3, 0, 0]}
               />
             </BarChart>
@@ -198,7 +199,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
       </BottomCard>
 
       {/* ── Gender Chart ──────────────────────────────────────────────── */}
-      <BottomCard $accent="#8b5cf6">
+      <BottomCard $accent={tokens.color.brand}>
         <div style={CHART_TITLE_STYLE}>{t('dashboard.genderTitle')}</div>
         <div style={{ flex: 1, minHeight: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -239,7 +240,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
       </BottomCard>
 
       {/* ── Cough Statistics Chart ────────────────────────────────────── */}
-      <BottomCard $accent="#f59e0b">
+      <BottomCard $accent={tokens.color.brand}>
         <div style={CHART_TITLE_STYLE}>{t('dashboard.coughStatsTitle')}</div>
         <div style={{ flex: 1, minHeight: 0 }}>
           <DistanceMetricChart
@@ -251,7 +252,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
         </div>
       </BottomCard>
       {/* ── Sick / Healthy Overview ───────────────────────────────────── */}
-      <BottomCard $accent="#ef4444">
+      <BottomCard $accent={tokens.color.brand}>
         <div style={CHART_TITLE_STYLE}>{t('dashboard.overviewTitle')}</div>
         <div style={{ flex: 1, minHeight: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -277,7 +278,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
                           x={cx}
                           y={cy - 4}
                           textAnchor="middle"
-                          fill="#111827"
+                          fill={tokens.color.heading}
                           style={{ fontSize: 18, fontWeight: 800 }}
                         >
                           {sickPct}%
@@ -286,7 +287,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
                           x={cx}
                           y={cy + 12}
                           textAnchor="middle"
-                          fill="#9ca3af"
+                          fill={tokens.color.muted}
                           style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.6 }}
                         >
                           SICK
@@ -295,8 +296,8 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
                     );
                   }}
                 />
-                <Cell fill="#ef4444" />
-                <Cell fill="#10b981" />
+                <Cell fill={tokens.color.danger} />
+                <Cell fill={tokens.color.success} />
               </Pie>
               <Tooltip
                 formatter={(value: number) => [value, '']}

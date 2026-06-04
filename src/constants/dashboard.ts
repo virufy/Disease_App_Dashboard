@@ -30,7 +30,10 @@ export const LOCATIONS = {
 
 export type LocationKey = keyof typeof LOCATIONS;
 
-export const COLORS = ["#ef4444", "#3b82f6", "#f97316", "#8b5cf6"];
+// Gender × sickness pie — meaningful, not decorative:
+// red = sick, green = healthy; darker shade = male, lighter = female.
+// Order matches genderSicknessData: [Sick Male, Non-Sick Male, Sick Female, Non-Sick Female]
+export const COLORS = ["#DC2626", "#16A34A", "#F87171", "#4ADE80"];
 
 export const AGE_GROUP_KEYS = [
   "<20",

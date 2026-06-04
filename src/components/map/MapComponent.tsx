@@ -19,21 +19,22 @@ interface MapProps {
   clusters: ClusterPoint[];
 }
 
-// Professional heatmap colour ramp — low density (indigo) → medium (cyan) →
+// Heatmap colour ramp — low density (brand teal) → medium (cyan) →
 // approaching hot (amber) → peak (scarlet)
 const HEAT_GRADIENT = {
-  0.0: "rgba(79, 70, 229, 0)",   // transparent indigo at 0
-  0.25: "#4f46e5",               // indigo
+  0.0: "rgba(13, 148, 136, 0)",  // transparent teal at 0
+  0.25: "#0d9488",               // teal
   0.5:  "#06b6d4",               // cyan
   0.7:  "#fbbf24",               // amber
   0.88: "#ef4444",               // red
   1.0:  "#fef2f2",               // near-white at peak
 };
 
+// Sick-rate semantic colours (match the dashboard's data tokens)
 const clusterColor = (sickRate: number) => {
-  if (sickRate >= 67) return "#ef4444";
-  if (sickRate >= 34) return "#f59e0b";
-  return "#10b981";
+  if (sickRate >= 67) return "#DC2626"; // danger
+  if (sickRate >= 34) return "#F59E0B"; // warning
+  return "#16A34A";                     // success
 };
 
 const MapComponent: React.FC<MapProps> = React.memo(

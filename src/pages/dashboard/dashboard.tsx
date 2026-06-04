@@ -31,6 +31,7 @@ import HeatmapLegend from "../../components/map/HeatmapLegend";
 import { useTranslation } from "react-i18next";
 import { LOCATIONS, LocationKey } from "../../constants/dashboard";
 import { IoDownloadOutline } from "react-icons/io5";
+import { tokens } from "../../styles/theme";
 
 interface HealthDataEntry {
   AgeGroup: string;
@@ -535,10 +536,12 @@ const Dashboard: React.FC = () => {
                 padding: "5px 12px",
                 background:
                   filteredHealthData.length > 0
-                    ? "linear-gradient(135deg, #1d4ed8, #4f46e5)"
-                    : "rgba(0,0,0,0.04)",
+                    ? tokens.color.brandGradient
+                    : tokens.color.surfaceAlt,
                 color:
-                  filteredHealthData.length > 0 ? "#ffffff" : "#9ca3af",
+                  filteredHealthData.length > 0
+                    ? tokens.color.white
+                    : tokens.color.faint,
                 border: "none",
                 borderRadius: 20,
                 fontSize: 11,
@@ -558,21 +561,24 @@ const Dashboard: React.FC = () => {
           {/* ── KPI Summary Bar ─────────────────────────────────────────── */}
           {hasData && (
             <KPIBar>
-              <KPICard $color="#3b82f6">
+              <KPICard $color={tokens.color.brand}>
                 <KPIValue>
                   {filteredHealthData.length.toLocaleString("en-US")}
                 </KPIValue>
                 <KPILabel>Total Cases</KPILabel>
               </KPICard>
-              <KPICard $color="#ef4444">
-                <KPIValue>{kpiData.sickRate}%</KPIValue>
+              {/* Sick Rate is the one KPI that carries a risk signal → semantic red */}
+              <KPICard $color={tokens.color.danger}>
+                <KPIValue style={{ color: tokens.color.danger }}>
+                  {kpiData.sickRate}%
+                </KPIValue>
                 <KPILabel>Sick Rate</KPILabel>
               </KPICard>
-              <KPICard $color="#8b5cf6">
+              <KPICard $color={tokens.color.brand}>
                 <KPIValue>{kpiData.topAgeGroup}</KPIValue>
                 <KPILabel>Top Age Group</KPILabel>
               </KPICard>
-              <KPICard $color="#f59e0b">
+              <KPICard $color={tokens.color.brand}>
                 <KPIValue
                   style={{ fontSize: 13, letterSpacing: 0 }}
                   title={kpiData.topSymptom}
