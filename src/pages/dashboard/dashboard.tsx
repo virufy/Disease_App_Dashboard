@@ -332,16 +332,25 @@ const Dashboard: React.FC = () => {
 
   // ── WebSocket ───────────────────────────────────────────────────────────────
 
-  const connectWebSocket = useCallback(() => {
+  useEffect(() => {
     const websocketURL = process.env.REACT_APP_WEBSOCKET_URL || "";
-    ws.current = new WebSocket(websocketURL);
+    if (!websocketURL) {
+      console.warn("REACT_APP_WEBSOCKET_URL is not set — dashboard has no data source");
+      return undefined;
+    }
 
-    ws.current.onopen = () => {
+    // Scope this socket to a local const. Every handler below references `socket`
+    // (never the shared `ws.current`), so under React StrictMode's dev-only
+    // mount→unmount→remount, an old socket's handlers can never close the new one.
+    const socket = new WebSocket(websocketURL);
+    ws.current = socket;
+
+    socket.onopen = () => {
       console.log("WebSocket connection opened");
-      ws.current?.send(JSON.stringify({ action: "send_initial_data" }));
+      socket.send(JSON.stringify({ action: "send_initial_data" }));
     };
 
-    ws.current.onmessage = (event) => {
+    socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.message === "connected") {
         console.log("WebSocket confirmed connection");
@@ -353,31 +362,36 @@ const Dashboard: React.FC = () => {
       }
     };
 
-    ws.current.onclose = (event) => {
+    socket.onclose = (event) => {
       console.log("WebSocket closed", event.code, event.reason);
     };
 
-    ws.current.onerror = (error) => {
+    // Do NOT close() here — the browser already tears the socket down on error,
+    // and closing the shared ref would kill an unrelated (newer) socket.
+    socket.onerror = (error) => {
       console.error("WebSocket error:", error);
-      ws.current?.close();
     };
-  }, []);
 
-  useEffect(() => {
-    connectWebSocket();
     const pingInterval = setInterval(
       () => {
-        if (ws.current?.readyState === WebSocket.OPEN) {
-          ws.current.send(JSON.stringify({ action: "ping", message: "ping" }));
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ action: "ping", message: "ping" }));
         }
       },
       5 * 60 * 1000,
     );
+
     return () => {
       clearInterval(pingInterval);
-      ws.current?.close();
+      // Closing a socket that's still CONNECTING triggers a spurious 1006 and the
+      // "closed before established" warning. Defer the close until it has opened.
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      } else if (socket.readyState === WebSocket.CONNECTING) {
+        socket.addEventListener("open", () => socket.close());
+      }
     };
-  }, [connectWebSocket]);
+  }, []);
 
   useEffect(() => {
     const loadSymptoms = async () => {
