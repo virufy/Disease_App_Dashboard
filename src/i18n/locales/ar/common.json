@@ -29,6 +29,20 @@
     "overviewTitle": "مريض / بصحة جيدة",
     "location": "الموقع",
     "loadingSymptoms": "جارٍ التحميل...",
+    "totalCases": "إجمالي الحالات",
+    "sickRateLabel": "معدل الإصابة",
+    "topAgeGroup": "الفئة العمرية الأكثر",
+    "topSymptom": "العرض الأكثر شيوعاً",
+    "export": "تصدير",
+    "exportTitle": "تصدير {{count}} سجل بصيغة CSV",
+    "noDataTitle": "لا توجد بيانات تطابق عوامل التصفية",
+    "noDataSubtitle": "جرّب موقعاً مختلفاً أو عدّل اختيار الأعراض",
+    "sickShort": "مريض",
+    "live": "مباشر",
+    "diseaseApp": "تطبيق الأمراض",
+    "caseDensity": "كثافة الحالات",
+    "low": "منخفض",
+    "high": "مرتفع",
     "locations": {
       "siliconValley": "سيليكون فالي",
       "dubai": "دبي"
@@ -43,5 +57,15 @@
     "nonSickMale": "ذكر بصحة جيدة",
     "sickFemale": "أنثى مريضة",
     "nonSickFemale": "أنثى بصحة جيدة"
+  },
+  "map": {
+    "cases_one": "حالة واحدة",
+    "cases_two": "حالتان",
+    "cases_few": "{{count}} حالات",
+    "cases_many": "{{count}} حالة",
+    "cases_other": "{{count}} حالة",
+    "sickRate": "معدل الإصابة",
+    "topSymptom": "العرض الأكثر",
+    "healthy": "بصحة جيدة"
   }
 }

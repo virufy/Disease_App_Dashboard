@@ -24,6 +24,9 @@ interface BottomChartsProps {
   sicknessData: Array<{ ageGroup: string; Sick: number; NotSick: number }>;
   genderSicknessData: Array<{ name: string; value: number }>;
   distanceMetrics: number[];
+  // Sick/total across ALL filtered records (matches the Sick Rate KPI denominator).
+  // Optional: falls back to the age-bucketed totals when omitted.
+  overview?: { sick: number; total: number };
 }
 
 const genderKeyMap: Record<string, string> = {
@@ -50,14 +53,19 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
   sicknessData,
   genderSicknessData,
   distanceMetrics,
+  overview,
 }) => {
   const { t } = useTranslation();
   const isRTL = selectedLanguage === 'ar';
 
   // ── Sick / Healthy overview totals ───────────────────────────────────────
-  const totalSick = sicknessData.reduce((sum, d) => sum + d.Sick, 0);
-  const totalHealthy = sicknessData.reduce((sum, d) => sum + d.NotSick, 0);
-  const grandTotal = totalSick + totalHealthy;
+  // Prefer the overview computed across ALL filtered records so the donut % matches
+  // the Sick Rate KPI exactly. Fall back to age-bucketed totals if not provided.
+  const ageSick = sicknessData.reduce((sum, d) => sum + d.Sick, 0);
+  const ageHealthy = sicknessData.reduce((sum, d) => sum + d.NotSick, 0);
+  const totalSick = overview ? overview.sick : ageSick;
+  const grandTotal = overview ? overview.total : ageSick + ageHealthy;
+  const totalHealthy = grandTotal - totalSick;
   const sickPct = grandTotal > 0 ? Math.round((totalSick / grandTotal) * 100) : 0;
   const overviewData = [
     { name: t('sicknessKeys.sick'), value: totalSick },
@@ -290,7 +298,7 @@ const BottomCharts: React.FC<BottomChartsProps> = ({
                           fill={tokens.color.muted}
                           style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.6 }}
                         >
-                          SICK
+                          {t('dashboard.sickShort')}
                         </text>
                       </g>
                     );

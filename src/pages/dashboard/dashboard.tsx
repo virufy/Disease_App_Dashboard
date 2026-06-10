@@ -38,7 +38,9 @@ interface HealthDataEntry {
   longitude: number;
   latitude: number;
   Sex: string;
-  DistanceMetric: number;
+  // The backend sometimes sends "N/A" (or other non-numeric strings) instead of a
+  // number, so accept both and coerce/guard at the point of use.
+  DistanceMetric: number | string;
   Symptoms: string[];
 }
 
@@ -196,7 +198,8 @@ const Dashboard: React.FC = () => {
 
   const kpiData = useMemo(() => {
     const total = filteredHealthData.length;
-    if (total === 0) return { sickRate: 0, topAgeGroup: "—", topSymptom: "—" };
+    if (total === 0)
+      return { sickRate: 0, topAgeGroup: "—", topSymptom: "—", sickCount: 0, total: 0 };
 
     const sickCount = filteredHealthData.filter(
       (e) => !e.Symptoms?.includes("none"),
@@ -228,6 +231,8 @@ const Dashboard: React.FC = () => {
       sickRate: Math.round((sickCount / total) * 100),
       topAgeGroup,
       topSymptom,
+      sickCount,
+      total,
     };
   }, [filteredHealthData, symptomsList]);
 
@@ -291,8 +296,17 @@ const Dashboard: React.FC = () => {
     [filteredHealthData],
   );
 
+  // Only finite numeric distance metrics reach the chart — records with "N/A"
+  // (or any non-numeric value) are dropped so the bell curve never plots NaN points.
   const distanceMetrics = useMemo(
-    () => filteredHealthData.map((e) => e.DistanceMetric),
+    () =>
+      filteredHealthData
+        .map((e) =>
+          typeof e.DistanceMetric === "number"
+            ? e.DistanceMetric
+            : parseFloat(e.DistanceMetric),
+        )
+        .filter((v): v is number => Number.isFinite(v)),
     [filteredHealthData],
   );
 
@@ -528,7 +542,9 @@ const Dashboard: React.FC = () => {
             <button
               onClick={handleExportCSV}
               disabled={filteredHealthData.length === 0}
-              title={`Export ${filteredHealthData.length} records as CSV`}
+              title={t("dashboard.exportTitle", {
+                count: filteredHealthData.length,
+              })}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -554,7 +570,7 @@ const Dashboard: React.FC = () => {
               }}
             >
               <IoDownloadOutline size={13} />
-              Export
+              {t("dashboard.export")}
             </button>
           </MapControls>
 
@@ -565,18 +581,18 @@ const Dashboard: React.FC = () => {
                 <KPIValue>
                   {filteredHealthData.length.toLocaleString("en-US")}
                 </KPIValue>
-                <KPILabel>Total Cases</KPILabel>
+                <KPILabel>{t("dashboard.totalCases")}</KPILabel>
               </KPICard>
               {/* Sick Rate is the one KPI that carries a risk signal → semantic red */}
               <KPICard $color={tokens.color.danger}>
                 <KPIValue style={{ color: tokens.color.danger }}>
                   {kpiData.sickRate}%
                 </KPIValue>
-                <KPILabel>Sick Rate</KPILabel>
+                <KPILabel>{t("dashboard.sickRateLabel")}</KPILabel>
               </KPICard>
               <KPICard $color={tokens.color.brand}>
                 <KPIValue>{kpiData.topAgeGroup}</KPIValue>
-                <KPILabel>Top Age Group</KPILabel>
+                <KPILabel>{t("dashboard.topAgeGroup")}</KPILabel>
               </KPICard>
               <KPICard $color={tokens.color.brand}>
                 <KPIValue
@@ -587,7 +603,7 @@ const Dashboard: React.FC = () => {
                     ? `${kpiData.topSymptom.slice(0, 12)}…`
                     : kpiData.topSymptom}
                 </KPIValue>
-                <KPILabel>Top Symptom</KPILabel>
+                <KPILabel>{t("dashboard.topSymptom")}</KPILabel>
               </KPICard>
             </KPIBar>
           )}
@@ -600,10 +616,10 @@ const Dashboard: React.FC = () => {
                 <div
                   style={{ fontSize: 14, fontWeight: 700, color: "#374151" }}
                 >
-                  No data matches your filters
+                  {t("dashboard.noDataTitle")}
                 </div>
                 <div style={{ fontSize: 12, color: "#9ca3af" }}>
-                  Try a different location or adjust the symptom selection
+                  {t("dashboard.noDataSubtitle")}
                 </div>
               </EmptyStateOverlay>
             ) : (
@@ -612,6 +628,7 @@ const Dashboard: React.FC = () => {
                 sicknessData={sicknessData}
                 genderSicknessData={genderSicknessData}
                 distanceMetrics={distanceMetrics}
+                overview={{ sick: kpiData.sickCount, total: kpiData.total }}
               />
             )}
           </FloatingCharts>

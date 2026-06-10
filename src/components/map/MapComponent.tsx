@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.heat";
@@ -39,6 +40,7 @@ const clusterColor = (sickRate: number) => {
 
 const MapComponent: React.FC<MapProps> = React.memo(
   ({ lat, lon, zoom, points, clusters }) => {
+    const { t, i18n } = useTranslation();
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<L.Map | null>(null);
     const heatLayerRef = useRef<L.HeatLayer | null>(null);
@@ -129,20 +131,22 @@ const MapComponent: React.FC<MapProps> = React.memo(
 
         const symptomLabel =
           cluster.topSymptom && cluster.topSymptom !== "none"
-            ? cluster.topSymptom
-            : "Healthy";
+            ? t(`symptoms.${cluster.topSymptom}`)
+            : t("map.healthy");
+
+        const dir = i18n.language === "ar" ? "rtl" : "ltr";
 
         marker.bindPopup(
-          `<div style="font-family:'Inter',sans-serif;padding:10px 14px;min-width:140px">
+          `<div dir="${dir}" style="font-family:'Inter',sans-serif;padding:10px 14px;min-width:140px">
             <div style="font-weight:800;font-size:14px;color:#111827;margin-bottom:6px">
-              ${cluster.count} case${cluster.count !== 1 ? "s" : ""}
+              ${t("map.cases", { count: cluster.count })}
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:3px">
-              <span>Sick rate</span>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#6b7280;margin-bottom:3px">
+              <span>${t("map.sickRate")}</span>
               <b style="color:${color}">${cluster.sickRate}%</b>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280">
-              <span>Top symptom</span>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#6b7280">
+              <span>${t("map.topSymptom")}</span>
               <b style="color:#374151">${symptomLabel}</b>
             </div>
           </div>`,
@@ -152,7 +156,7 @@ const MapComponent: React.FC<MapProps> = React.memo(
       });
 
       clusterLayerRef.current.addTo(mapRef.current);
-    }, [clusters]);
+    }, [clusters, t, i18n.language]);
 
     return (
       <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />

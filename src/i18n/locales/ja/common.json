@@ -29,6 +29,20 @@
     "overviewTitle": "病気 / 健康",
     "location": "場所",
     "loadingSymptoms": "読み込み中...",
+    "totalCases": "総症例数",
+    "sickRateLabel": "罹患率",
+    "topAgeGroup": "最多年齢層",
+    "topSymptom": "最多症状",
+    "export": "エクスポート",
+    "exportTitle": "{{count}} 件をCSVでエクスポート",
+    "noDataTitle": "フィルターに一致するデータがありません",
+    "noDataSubtitle": "別の場所を選ぶか、症状の選択を調整してください",
+    "sickShort": "病気",
+    "live": "ライブ",
+    "diseaseApp": "疾病アプリ",
+    "caseDensity": "症例密度",
+    "low": "低",
+    "high": "高",
     "locations": {
       "siliconValley": "シリコンバレー",
       "dubai": "ドバイ"
@@ -43,5 +57,11 @@
     "nonSickMale": "健康な男性",
     "sickFemale": "病気の女性",
     "nonSickFemale": "健康な女性"
+  },
+  "map": {
+    "cases_other": "{{count}} 件",
+    "sickRate": "罹患率",
+    "topSymptom": "主な症状",
+    "healthy": "健康"
   }
 }

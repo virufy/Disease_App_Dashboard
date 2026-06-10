@@ -117,7 +117,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
         </a>
         <LiveBadge>
           <LiveDot />
-          <LiveLabel>Live</LiveLabel>
+          <LiveLabel>{t("dashboard.live")}</LiveLabel>
         </LiveBadge>
         <TestDataText>{t("menu.testData")}</TestDataText>
       </LogoWrapper>
@@ -176,7 +176,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
 
       {/* ── Footer ─────────────────────────────────────── */}
       <SideMenuFooter>
-        <FooterLabel>Disease App</FooterLabel>
+        <FooterLabel>{t("dashboard.diseaseApp")}</FooterLabel>
         <QRLink href="/disease-app" target="_blank" rel="noopener noreferrer">
           <QRCode />
         </QRLink>

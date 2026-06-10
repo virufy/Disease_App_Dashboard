@@ -1,7 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { tokens } from "../../styles/theme";
 
-const HeatmapLegend: React.FC = () => (
+const HeatmapLegend: React.FC = () => {
+  const { t } = useTranslation();
+  return (
   <div
     style={{
       position: "absolute",
@@ -28,7 +31,7 @@ const HeatmapLegend: React.FC = () => (
         marginBottom: "6px",
       }}
     >
-      Case Density
+      {t("dashboard.caseDensity")}
     </div>
     <div
       style={{
@@ -48,13 +51,14 @@ const HeatmapLegend: React.FC = () => (
       }}
     >
       <span style={{ fontSize: "9px", color: tokens.color.faint, fontWeight: 500 }}>
-        Low
+        {t("dashboard.low")}
       </span>
       <span style={{ fontSize: "9px", color: tokens.color.faint, fontWeight: 500 }}>
-        High
+        {t("dashboard.high")}
       </span>
     </div>
   </div>
-);
+  );
+};
 
 export default HeatmapLegend;

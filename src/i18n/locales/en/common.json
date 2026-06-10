@@ -29,6 +29,20 @@
     "overviewTitle": "Sick / Healthy",
     "location": "Location",
     "loadingSymptoms": "Loading...",
+    "totalCases": "Total Cases",
+    "sickRateLabel": "Sick Rate",
+    "topAgeGroup": "Top Age Group",
+    "topSymptom": "Top Symptom",
+    "export": "Export",
+    "exportTitle": "Export {{count}} records as CSV",
+    "noDataTitle": "No data matches your filters",
+    "noDataSubtitle": "Try a different location or adjust the symptom selection",
+    "sickShort": "SICK",
+    "live": "Live",
+    "diseaseApp": "Disease App",
+    "caseDensity": "Case Density",
+    "low": "Low",
+    "high": "High",
     "locations": {
       "siliconValley": "Silicon Valley",
       "dubai": "Dubai"
@@ -43,5 +57,12 @@
     "nonSickMale": "Healthy Male",
     "sickFemale": "Sick Female",
     "nonSickFemale": "Healthy Female"
+  },
+  "map": {
+    "cases_one": "{{count}} case",
+    "cases_other": "{{count}} cases",
+    "sickRate": "Sick rate",
+    "topSymptom": "Top symptom",
+    "healthy": "Healthy"
   }
 }
