@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
     const topSymptomId =
       Object.entries(symFreq).sort((a, b) => b[1] - a[1])[0]?.[0];
     const topSymptom = topSymptomId
-      ? (symptomsList.find((s) => s.id === topSymptomId)?.label ?? topSymptomId)
+      ? t(`symptoms.${topSymptomId}`, { defaultValue: topSymptomId })
       : "—";
 
     return {
@@ -229,7 +229,7 @@ const Dashboard: React.FC = () => {
       topAgeGroup,
       topSymptom,
     };
-  }, [filteredHealthData, symptomsList]);
+  }, [filteredHealthData, t]);
 
   // ── Map cluster points ──────────────────────────────────────────────────────
 

@@ -1,7 +1,9 @@
 {
   "menu": {
     "language": "Language",
-    "testData": "Test data"
+    "testData": "Test data",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
   },
   "sidebar": {
     "total": "Total",

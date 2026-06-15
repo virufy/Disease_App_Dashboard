@@ -94,7 +94,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
           </MenuIconOnly>
         </NavSection>
 
-        <CollapseButton onClick={toggleCollapse} title="Expand sidebar">
+        <CollapseButton onClick={toggleCollapse} title={t("menu.expandSidebar")}>
           {isRTL ? <IoChevronBack size={14} /> : <IoChevronForward size={14} />}
         </CollapseButton>
 
@@ -170,7 +170,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
       </NavSection>
 
       {/* ── Collapse toggle ─────────────────────────────── */}
-      <CollapseButton onClick={toggleCollapse} title="Collapse sidebar">
+      <CollapseButton onClick={toggleCollapse} title={t("menu.collapseSidebar")}>
         {isRTL ? <IoChevronForward size={14} /> : <IoChevronBack size={14} />}
       </CollapseButton>
 
