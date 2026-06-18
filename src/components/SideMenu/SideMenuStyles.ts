@@ -1,13 +1,16 @@
 import styled, { keyframes } from "styled-components";
 import virufyLogo from "../../assets/images/virufyLogo.png";
 import qrCode from "../../assets/images/qrcode.png";
+import { tokens } from "../../styles/theme";
 
+// Transient ($-prefixed) props are consumed by styled-components and NOT
+// forwarded to the DOM — this avoids React "unknown attribute" warnings.
 interface SubMenuProps {
-  isOpen: boolean;
+  $isOpen: boolean;
 }
 
 interface SubMenuItemProps {
-  active?: boolean;
+  $active?: boolean;
 }
 
 // ─── Animations ───────────────────────────────────────────────────────────────
@@ -54,10 +57,10 @@ export const LogoWrapper = styled.div<{ $collapsed?: boolean }>`
   justify-content: center;
   padding: ${(p) => (p.$collapsed ? "16px 0" : "22px 20px 18px")};
   gap: 10px;
-  /* Warm blue glow under the logo */
+  /* Soft teal glow under the logo */
   background: radial-gradient(
     ellipse at 50% 130%,
-    rgba(37, 99, 235, 0.12) 0%,
+    rgba(45, 212, 191, 0.12) 0%,
     transparent 70%
   );
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -110,8 +113,8 @@ export const StatsSection = styled.div`
   /* Gradient border via background-clip trick */
   background: linear-gradient(
     135deg,
-    rgba(37, 99, 235, 0.1) 0%,
-    rgba(16, 185, 129, 0.07) 100%
+    rgba(45, 212, 191, 0.1) 0%,
+    rgba(13, 148, 136, 0.07) 100%
   );
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
@@ -136,13 +139,13 @@ export const StatDivider = styled.div`
 export const StatValue = styled.div<{ $highlighted?: boolean }>`
   font-size: 20px;
   font-weight: 800;
-  color: ${(p) => (p.$highlighted ? "#60a5fa" : "#f1f5f9")};
+  color: ${(p) => (p.$highlighted ? tokens.color.brandOnDark : "#f1f5f9")};
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.8px;
   line-height: 1;
   ${(p) =>
     p.$highlighted &&
-    `text-shadow: 0 0 16px rgba(96, 165, 250, 0.35);`}
+    `text-shadow: 0 0 16px rgba(45, 212, 191, 0.35);`}
 `;
 
 export const StatLabel = styled.div`
@@ -179,7 +182,7 @@ export const MenuItem = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.04);
     color: #e2e8f0;
-    border-left-color: #3b82f6;
+    border-left-color: ${tokens.color.brandOnDark};
   }
 
   svg {
@@ -209,7 +212,7 @@ export const MenuIconOnly = styled.div`
 `;
 
 export const SubMenu = styled.div<SubMenuProps>`
-  max-height: ${(p) => (p.isOpen ? "200px" : "0")};
+  max-height: ${(p) => (p.$isOpen ? "200px" : "0")};
   overflow: hidden;
   transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 `;
@@ -218,11 +221,12 @@ export const SubMenuItem = styled.div<SubMenuItemProps>`
   padding: 8px 18px 8px 46px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: ${(p) => (p.active ? "600" : "400")};
-  color: ${(p) => (p.active ? "#60a5fa" : "#64748b")};
+  font-weight: ${(p) => (p.$active ? "600" : "400")};
+  color: ${(p) => (p.$active ? tokens.color.brandOnDark : "#64748b")};
   background: ${(p) =>
-    p.active ? "rgba(59, 130, 246, 0.08)" : "transparent"};
-  border-left: 2px solid ${(p) => (p.active ? "#3b82f6" : "transparent")};
+    p.$active ? tokens.color.brandOnDarkSoft : "transparent"};
+  border-left: 2px solid
+    ${(p) => (p.$active ? tokens.color.brandOnDark : "transparent")};
   transition: all 0.15s ease;
   white-space: nowrap;
   letter-spacing: 0.1px;
@@ -235,7 +239,8 @@ export const SubMenuItem = styled.div<SubMenuItemProps>`
   [dir="rtl"] & {
     padding: 8px 46px 8px 18px;
     border-left: none;
-    border-right: 2px solid ${(p) => (p.active ? "#3b82f6" : "transparent")};
+    border-right: 2px solid
+      ${(p) => (p.$active ? tokens.color.brandOnDark : "transparent")};
   }
 `;
 
@@ -257,14 +262,14 @@ export const CollapseButton = styled.button`
   flex-shrink: 0;
 
   &:hover {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.35);
-    color: #60a5fa;
+    background: rgba(45, 212, 191, 0.1);
+    border-color: rgba(45, 212, 191, 0.35);
+    color: ${tokens.color.brandOnDark};
   }
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35);
   }
 `;
 

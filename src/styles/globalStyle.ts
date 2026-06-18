@@ -32,7 +32,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   .leaflet-control-attribution a {
-    color: rgba(37, 99, 235, 0.7) !important;
+    color: rgba(13, 148, 136, 0.8) !important;
   }
 
   /* Leaflet zoom controls – clean on light map */
@@ -44,8 +44,8 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   .leaflet-bar a:hover {
-    background: rgba(239, 246, 255, 0.98) !important;
-    color: #1d4ed8 !important;
+    background: rgba(236, 253, 250, 0.98) !important;
+    color: #0f766e !important;
   }
 
   /* Leaflet popup – Inter font, rounded, no harsh shadow */

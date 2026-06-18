@@ -1,7 +1,9 @@
 {
   "menu": {
     "language": "اللغة",
-    "testData": "بيانات تجريبية"
+    "testData": "بيانات تجريبية",
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapseSidebar": "طي الشريط الجانبي"
   },
   "sidebar": {
     "total": "الإجمالي",
