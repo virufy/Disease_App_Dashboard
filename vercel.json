@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "create-react-app",
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "build": {
+    "env": {
+      "CI": "false",
+      "REACT_APP_WEBSOCKET_URL": "wss://vz2wg8vuxh.execute-api.us-east-1.amazonaws.com/production/"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
