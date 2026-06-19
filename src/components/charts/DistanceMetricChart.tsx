@@ -40,8 +40,8 @@ const generateBellCurveData = (mean: number, stdDev: number) => {
 };
 
 const generateColor = (index: number, total: number) => {
-  // Gradient from indigo (low) through amber to red (high) — matches heatmap ramp
-  const palette = ['#4f46e5', '#06b6d4', '#fbbf24', '#ef4444'];
+  // Gradient from teal (low) through amber to red (high) — matches heatmap ramp
+  const palette = ['#0d9488', '#06b6d4', '#fbbf24', '#ef4444'];
   if (total <= 1) return palette[3];
   const t = index / (total - 1);
   if (t >= 0.75) return palette[3];

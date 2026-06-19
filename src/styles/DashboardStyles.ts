@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+import { tokens } from "./theme";
 
 // ─── Entrance animations ──────────────────────────────────────────────────────
 
@@ -20,7 +21,7 @@ export const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #0b1220;
+  background: ${tokens.color.canvas};
 `;
 
 export const MapSection = styled.div`
@@ -45,16 +46,13 @@ export const MapControls = styled.div`
   align-items: center;
   padding: 9px 20px;
 
-  /* Bright frosted glass pill */
+  /* Frosted glass pill — single soft shadow */
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 50px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 6px 28px rgba(0, 0, 0, 0.18),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid ${tokens.color.border};
+  border-radius: ${tokens.radius.pill};
+  box-shadow: ${tokens.shadow.lg};
 
   animation: ${slideDown} 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 
@@ -65,7 +63,7 @@ export const MapControls = styled.div`
     width: calc(100% - 32px);
     left: 16px;
     transform: none;
-    border-radius: 16px;
+    border-radius: ${tokens.radius.lg};
     animation: none;
   }
 `;
@@ -76,7 +74,7 @@ export const FilterDivider = styled.div`
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(0, 0, 0, 0.12),
+    ${tokens.color.border},
     transparent
   );
   margin: 0 14px;
@@ -94,7 +92,7 @@ export const FilterGroup = styled.div`
 `;
 
 export const FilterLabel = styled.span`
-  color: #4b5563;
+  color: ${tokens.color.muted};
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
@@ -113,14 +111,13 @@ export const FilterBadge = styled.span`
   min-width: 17px;
   height: 17px;
   padding: 0 4px;
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
-  color: #ffffff;
+  background: ${tokens.color.brand};
+  color: ${tokens.color.white};
   border-radius: 10px;
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
   flex-shrink: 0;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
 `;
 
 export const ChipRow = styled.div`
@@ -132,42 +129,36 @@ export const ChipRow = styled.div`
 
 export const Chip = styled.button<{ $active: boolean }>`
   background: ${({ $active }) =>
-    $active
-      ? "linear-gradient(135deg, #1d4ed8, #4f46e5)"
-      : "rgba(0, 0, 0, 0.04)"};
-  color: ${({ $active }) => ($active ? "#ffffff" : "#374151")};
+    $active ? tokens.color.brand : tokens.color.surfaceAlt};
+  color: ${({ $active }) =>
+    $active ? tokens.color.white : tokens.color.body};
   border: 1px solid
-    ${({ $active }) => ($active ? "transparent" : "rgba(0, 0, 0, 0.08)")};
-  border-radius: 20px;
+    ${({ $active }) => ($active ? "transparent" : tokens.color.border)};
+  border-radius: ${tokens.radius.pill};
   padding: 4px 12px;
   font-size: 11px;
-  font-weight: ${({ $active }) => ($active ? "600" : "400")};
+  font-weight: ${({ $active }) => ($active ? "600" : "500")};
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
   user-select: none;
   line-height: 1.5;
-  box-shadow: ${({ $active }) =>
-    $active ? "0 2px 6px rgba(37,99,235,0.35)" : "none"};
 
   &:hover {
     background: ${({ $active }) =>
-      $active
-        ? "linear-gradient(135deg, #1e40af, #4338ca)"
-        : "rgba(0, 0, 0, 0.08)"};
-    color: ${({ $active }) => ($active ? "#ffffff" : "#111827")};
+      $active ? tokens.color.brandHover : "#EEF2F6"};
+    color: ${({ $active }) =>
+      $active ? tokens.color.white : tokens.color.heading};
     transform: translateY(-1px);
-    box-shadow: ${({ $active }) =>
-      $active ? "0 4px 10px rgba(37,99,235,0.4)" : "0 1px 3px rgba(0,0,0,0.08)"};
   }
 
   &:active {
     transform: translateY(0);
   }
 
-  &:focus {
+  &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    box-shadow: ${tokens.shadow.focus};
   }
 `;
 
@@ -196,10 +187,10 @@ export const KPICard = styled.div<{ $color?: string }>`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  border-left: 3px solid ${({ $color }) => $color ?? "#3b82f6"};
+  border: 1px solid ${tokens.color.borderSoft};
+  border-radius: ${tokens.radius.md};
+  box-shadow: ${tokens.shadow.md};
+  border-left: 3px solid ${({ $color }) => $color ?? tokens.color.brand};
   white-space: nowrap;
   min-width: 88px;
 `;
@@ -207,18 +198,18 @@ export const KPICard = styled.div<{ $color?: string }>`
 export const KPIValue = styled.div`
   font-size: 19px;
   font-weight: 800;
-  color: #111827;
+  color: ${tokens.color.heading};
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.5px;
 `;
 
 export const KPILabel = styled.div`
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.7px;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: ${tokens.color.muted};
   margin-top: 4px;
 `;
 
@@ -248,16 +239,16 @@ export const BottomCard = styled.div<{ $accent?: string }>`
   display: flex;
   flex-direction: column;
   padding: 12px 14px 10px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: ${tokens.color.surface};
+  border: 1px solid ${tokens.color.borderSoft};
+  border-radius: ${tokens.radius.md};
+  box-shadow: ${tokens.shadow.sm};
   overflow: hidden;
-  border-top: 2.5px solid ${({ $accent }) => $accent ?? "#e2e8f0"};
+  border-top: 2.5px solid ${({ $accent }) => $accent ?? tokens.color.border};
   transition: box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: ${tokens.shadow.md};
   }
 `;
 
@@ -269,23 +260,20 @@ export const FloatingCharts = styled.div`
   z-index: 1000;
   height: 34vh;
 
-  /* Crisp frosted glass panel */
+  /* Frosted glass panel */
   background: rgba(248, 250, 253, 0.97);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 
-  /* Coloured top accent + subtle border elsewhere */
-  border-top: 2px solid rgba(99, 102, 241, 0.3);
-  border-left: 1px solid rgba(0, 0, 0, 0.06);
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  /* Brand top accent + subtle border elsewhere */
+  border-top: 2px solid rgba(13, 148, 136, 0.35);
+  border-left: 1px solid ${tokens.color.borderSoft};
+  border-right: 1px solid ${tokens.color.borderSoft};
+  border-bottom: 1px solid ${tokens.color.borderSoft};
 
-  border-radius: 16px;
+  border-radius: ${tokens.radius.lg};
   padding: 14px 16px;
-  box-shadow:
-    0 -4px 24px rgba(0, 0, 0, 0.08),
-    0 16px 48px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: ${tokens.shadow.lg};
 
   animation: ${slideUp} 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 

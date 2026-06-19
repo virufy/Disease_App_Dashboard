@@ -1,7 +1,9 @@
 {
   "menu": {
     "language": "言語",
-    "testData": "テストデータ"
+    "testData": "テストデータ",
+    "expandSidebar": "サイドバーを展開",
+    "collapseSidebar": "サイドバーを折りたたむ"
   },
   "sidebar": {
     "total": "合計",
