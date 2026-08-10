@@ -1,6 +1,6 @@
 import React from 'react';
-import { GlobalStyle } from './globalStyle';
-import Dashboard from './dashboard/dashboard';
+import { GlobalStyle } from './styles/globalStyle';
+import Dashboard from './pages/dashboard/dashboard';
 
 const App: React.FC = () => {
   return (

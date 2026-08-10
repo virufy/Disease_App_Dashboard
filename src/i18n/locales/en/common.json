@@ -1,0 +1,49 @@
+{
+  "menu": {
+    "language": "Language",
+    "testData": "Test data",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
+  },
+  "sidebar": {
+    "total": "Total",
+    "filtered": "Filtered"
+  },
+  "languages": {
+    "english": "English",
+    "arabic": "العربية (Arabic)",
+    "japanese": "日本語 (Japanese)"
+  },
+  "symptoms": {
+    "All": "All",
+    "heavysmoker": "Heavy Smoker",
+    "cold": "Cold",
+    "influenza": "Influenza",
+    "covid": "COVID-19",
+    "sars": "SARS",
+    "rsv": "RSV"
+  },
+  "dashboard": {
+    "symptomsLabel": "Symptoms",
+    "ageTitle": "Age Distribution",
+    "genderTitle": "Gender Breakdown",
+    "coughStatsTitle": "Cough Statistics",
+    "overviewTitle": "Sick / Healthy",
+    "location": "Location",
+    "loadingSymptoms": "Loading...",
+    "locations": {
+      "siliconValley": "Silicon Valley",
+      "dubai": "Dubai"
+    }
+  },
+  "sicknessKeys": {
+    "sick": "Sick",
+    "notSick": "Healthy"
+  },
+  "gender": {
+    "sickMale": "Sick Male",
+    "nonSickMale": "Healthy Male",
+    "sickFemale": "Sick Female",
+    "nonSickFemale": "Healthy Female"
+  }
+}

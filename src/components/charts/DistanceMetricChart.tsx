@@ -5,7 +5,7 @@ interface DistanceMetricChartProps {
   mean: number;
   stdDev: number;
   distanceMetrics: number[];
-  language: 'en' | 'ar' | 'ja'; // Add language prop
+  language: 'en' | 'ar' | 'ja';
 }
 
 const translations = {
@@ -40,24 +40,39 @@ const generateBellCurveData = (mean: number, stdDev: number) => {
 };
 
 const generateColor = (index: number, total: number) => {
-  if (index === total - 1) {
-    return 'rgba(255, 0, 0, 1)'; // Latest line: Fully opaque red
-  } else if (index === total - 2) {
-    return 'rgba(255, 0, 0, 0.4)'; // Second latest line: Less opaque red
-  } else {
-    const opacity = 0.1 + 0.3 * (index / total); // Gradually increase opacity for older lines
-    return `rgba(255, 0, 0, ${opacity})`;
-  }
+  // Gradient from teal (low) through amber to red (high) — matches heatmap ramp
+  const palette = ['#0d9488', '#06b6d4', '#fbbf24', '#ef4444'];
+  if (total <= 1) return palette[3];
+  const t = index / (total - 1);
+  if (t >= 0.75) return palette[3];
+  if (t >= 0.5)  return palette[2];
+  if (t >= 0.25) return palette[1];
+  return palette[0];
 };
 
 const CustomTooltip = ({ active, payload, label, language }: any) => {
   if (active && payload && payload.length) {
-    const t = translations[language as 'en' | 'ar' | 'ja']; // Use type assertion
+    const t = translations[language as 'en' | 'ar' | 'ja'];
     const bellCurveValue = payload.find((entry: any) => entry.name === "Probability");
+    const isRTL = language === 'ar';
+
     return (
-      <div style={{ backgroundColor: 'white', border: '1px solid #ccc', padding: '5px' }}>
-        <p style={{ color: '#ff5632' }}>{`${t.tooltipDistance}: ${label.toFixed(2)}`}</p>
-        {bellCurveValue && <p style={{ color: '#4BC0C0' }}>{`${t.tooltipProbability}: ${bellCurveValue.value.toFixed(4)}`}</p>}
+      <div
+        style={{
+          background: '#fff',
+          border: '1px solid rgba(0,0,0,0.1)',
+          borderRadius: 8,
+          padding: '8px 12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          fontSize: 12,
+          textAlign: isRTL ? 'right' : 'left',
+          direction: isRTL ? 'rtl' : 'ltr',
+        }}
+      >
+        <p style={{ margin: '0 0 4px', color: '#ef4444', fontWeight: 500 }}>{`${t.tooltipDistance}: ${label.toFixed(2)}`}</p>
+        {bellCurveValue && (
+          <p style={{ margin: 0, color: '#14b8a6' }}>{`${t.tooltipProbability}: ${bellCurveValue.value.toFixed(4)}`}</p>
+        )}
       </div>
     );
   }
@@ -66,42 +81,95 @@ const CustomTooltip = ({ active, payload, label, language }: any) => {
 
 const generateTicks = (min: number, max: number) => {
   const interval = (max - min) / 4;
-  return [
-    min,
-    min + interval,
-    min + 2 * interval,
-    min + 3 * interval,
-    max,
-  ];
+  return [min, min + interval, min + 2 * interval, min + 3 * interval, max];
 };
 
-const DistanceMetricChart: React.FC<DistanceMetricChartProps> = ({ mean, stdDev, distanceMetrics, language }) => {
-  const t = translations[language]; // Select translations based on the language
+const DistanceMetricChart: React.FC<DistanceMetricChartProps> = ({
+  mean,
+  stdDev,
+  distanceMetrics,
+  language,
+}) => {
+  const t = translations[language];
+  const isRTL = language === 'ar';
+
   const bellCurveData = generateBellCurveData(mean, stdDev);
   const minX = mean - 3 * stdDev;
   const maxX = mean + 3 * stdDev;
-
   const ticks = generateTicks(minX, maxX);
+  const chartMargin = { top: 20, right: 20, left: 20, bottom: 20 };
+
+  const renderCustomizedTick = (props: any) => {
+    const { x, y, payload } = props;
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dy={16}
+          dx={2}
+          textAnchor="middle"
+          fill="#9ca3af"
+        >
+          {payload.value.toFixed(2)}
+        </text>
+      </g>
+    );
+  };
+
+const renderYAxisTick = (props: any) => {
+  const { x, y, payload } = props;
+  const dx = isRTL ? 5 : -30;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dx={dx}
+        dy={4}
+        textAnchor={isRTL ? 'end' : 'start'}
+        fill="#9ca3af"
+      >
+        {payload.value.toFixed(2)}
+      </text>
+    </g>
+  );
+};
 
   return (
-    <ResponsiveContainer width="100%" height="93%">
-      <ComposedChart>
+    <ResponsiveContainer width="100%" height="100%">
+      <ComposedChart margin={chartMargin}>
         <XAxis
           dataKey="x"
-          label={{ value: t.distanceMetric, position: 'insideBottom', offset: -5 }}
+          label={{
+            value: t.distanceMetric,
+            position: 'insideBottom',
+            offset: -15,
+            fill: '#9ca3af',
+            fontSize: 10,
+          }}
           type="number"
           domain={['dataMin', 'dataMax']}
           ticks={ticks}
           tickFormatter={(value) => value.toFixed(2)}
+          tick={renderCustomizedTick}
+          axisLine={false}
+          tickLine={false}
         />
         <YAxis
+          orientation={isRTL ? 'right' : 'left'}
           label={{
             value: t.probabilityDensity,
             angle: -90,
-            position: 'insideLeft',
-            offset: 10,
-            dy: 65,
+            position: isRTL ? 'insideRight' : 'insideLeft',
+            offset: 0,
+            dy: isRTL ? 40 : 60,
+            fill: '#9ca3af',
+            fontSize: 10,
           }}
+          tick={renderYAxisTick}
+          axisLine={false}
+          tickLine={false}
         />
         <ZAxis range={[30, 31]} />
         <Tooltip content={<CustomTooltip language={language} />} />
@@ -110,14 +178,16 @@ const DistanceMetricChart: React.FC<DistanceMetricChartProps> = ({ mean, stdDev,
           type="monotone"
           dataKey="y"
           data={bellCurveData}
-          fill="rgba(75, 192, 192, 0.2)"
-          stroke="#4BC0C0"
+          fill="rgba(6, 182, 212, 0.15)"
+          stroke="#06b6d4"
+          strokeWidth={2}
           name="Probability"
         />
 
         {distanceMetrics.map((metric, index) => {
           const yValue =
-            (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((metric - mean) / stdDev) ** 2);
+            (1 / (stdDev * Math.sqrt(2 * Math.PI))) *
+            Math.exp(-0.5 * ((metric - mean) / stdDev) ** 2);
 
           return (
             <React.Fragment key={`line-${index}`}>

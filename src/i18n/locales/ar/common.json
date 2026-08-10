@@ -1,0 +1,49 @@
+{
+  "menu": {
+    "language": "اللغة",
+    "testData": "بيانات تجريبية",
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapseSidebar": "طي الشريط الجانبي"
+  },
+  "sidebar": {
+    "total": "الإجمالي",
+    "filtered": "مُصفّى"
+  },
+  "languages": {
+    "english": "English",
+    "arabic": "العربية (Arabic)",
+    "japanese": "日本語 (Japanese)"
+  },
+  "symptoms": {
+    "All": "الكل",
+    "heavysmoker": "مدخن ثقيل",
+    "cold": "نزلة برد",
+    "influenza": "إنفلونزا",
+    "covid": "كوفيد-19",
+    "sars": "سارس",
+    "rsv": "فيروس RSV"
+  },
+  "dashboard": {
+    "symptomsLabel": "الأعراض",
+    "ageTitle": "توزيع الأعمار",
+    "genderTitle": "التوزيع الجنسي",
+    "coughStatsTitle": "إحصائيات السعال",
+    "overviewTitle": "مريض / بصحة جيدة",
+    "location": "الموقع",
+    "loadingSymptoms": "جارٍ التحميل...",
+    "locations": {
+      "siliconValley": "سيليكون فالي",
+      "dubai": "دبي"
+    }
+  },
+  "sicknessKeys": {
+    "sick": "مريض",
+    "notSick": "بصحة جيدة"
+  },
+  "gender": {
+    "sickMale": "ذكر مريض",
+    "nonSickMale": "ذكر بصحة جيدة",
+    "sickFemale": "أنثى مريضة",
+    "nonSickFemale": "أنثى بصحة جيدة"
+  }
+}
