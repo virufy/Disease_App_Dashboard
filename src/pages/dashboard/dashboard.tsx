@@ -16,6 +16,7 @@ import BottomCharts from "../../components/charts/BottomCharts";
 import SideMenu from "../../components/SideMenu/SideMenu";
 import { useTranslation } from "react-i18next";
 import { LOCATIONS, LocationKey } from "../../constants/dashboard";
+import { getReconnectDelay, shouldReconnectOnClose } from "./socketUtils";
 
 interface HealthDataEntry {
 	AgeGroup: string;
@@ -130,6 +131,9 @@ const Dashboard: React.FC = () => {
 	const [selectedSymptom, setSelectedSymptom] = useState<string>("All");
 
 	const ws = useRef<WebSocket | null>(null);
+	const reconnectTimerRef = useRef<number | null>(null);
+	const reconnectAttemptsRef = useRef(0);
+	const isUnmountedRef = useRef(false);
 	const [selectedLanguage, setSelectedLanguage] = useState<"en" | "ar" | "ja">(
 		"en"
 	);
@@ -161,23 +165,28 @@ const Dashboard: React.FC = () => {
 			return;
 		}
 
+		if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+			return;
+		}
+
+		if (ws.current && ws.current.readyState === WebSocket.CONNECTING) {
+			return;
+		}
+
 		ws.current = new WebSocket(websocketURL);
 
 		ws.current.onopen = () => {
 			console.log("WebSocket connection opened");
-
-			// Send initial data immediately after connection
+			reconnectAttemptsRef.current = 0;
 			ws.current?.send(JSON.stringify({ action: "send_initial_data" }));
 		};
 
 		ws.current.onmessage = (event) => {
 			try {
 				const data = JSON.parse(event.data);
-				console.log("WebSocket message received:", data);
 				if (data.message === "connected") {
 					console.log("WebSocket confirmed connection");
 				} else {
-					// Handle health data updates
 					const healthDataEntry = data as HealthDataEntry;
 					if (healthDataEntry.Symptoms) {
 						setHealthData((prevData) => [...prevData, healthDataEntry]);
@@ -189,21 +198,38 @@ const Dashboard: React.FC = () => {
 		};
 
 		ws.current.onclose = (event) => {
-			console.log("WebSocket connection closed unexpectedly");
-			console.log(`Code: ${event.code}, Reason: ${event.reason}`);
+			if (isUnmountedRef.current) {
+				return;
+			}
+
+			if (shouldReconnectOnClose(event.code)) {
+				const delay = getReconnectDelay(reconnectAttemptsRef.current);
+				reconnectAttemptsRef.current += 1;
+				console.warn(
+					`WebSocket closed unexpectedly (code ${event.code}). Reconnecting in ${delay}ms...`
+				);
+				if (reconnectTimerRef.current) {
+					window.clearTimeout(reconnectTimerRef.current);
+				}
+				reconnectTimerRef.current = window.setTimeout(() => {
+					connectWebSocket();
+				}, delay);
+				return;
+			}
+
+			console.log("WebSocket connection closed normally", event.code);
 		};
 
 		ws.current.onerror = (error) => {
 			console.error("WebSocket error:", error);
-			ws.current?.close();
 		};
 	}, []);
 
 	useEffect(() => {
-		connectWebSocket(); // Initial connection attempt
+		isUnmountedRef.current = false;
+		connectWebSocket();
 
-		// Ping every 5 minutes to keep the connection alive
-		const pingInterval = setInterval(
+		const pingInterval = window.setInterval(
 			() => {
 				if (ws.current?.readyState === WebSocket.OPEN) {
 					ws.current.send(JSON.stringify({ action: "ping", message: "ping" }));
@@ -213,8 +239,14 @@ const Dashboard: React.FC = () => {
 		);
 
 		return () => {
-			clearInterval(pingInterval);
-			ws.current?.close();
+			isUnmountedRef.current = true;
+			window.clearInterval(pingInterval);
+			if (reconnectTimerRef.current) {
+				window.clearTimeout(reconnectTimerRef.current);
+			}
+			if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+				ws.current.close(1000, "Component unmounting");
+			}
 		};
 	}, [connectWebSocket]);
 
