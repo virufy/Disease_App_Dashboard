@@ -5,10 +5,22 @@ jest.mock("../../components/map/MapComponent", () => () => (
 	<div data-testid="map" />
 ));
 
+jest.mock("../../components/charts/BottomCharts", () => () => (
+	<div data-testid="bottom-charts" />
+));
+
+jest.mock("../../components/SideMenu/SideMenu", () => () => (
+	<div data-testid="side-menu" />
+));
+
+jest.mock("../../services/symptomService", () => ({
+	fetchSymptoms: jest.fn().mockResolvedValue([])
+}));
+
 jest.mock("react-i18next", () => ({
 	useTranslation: () => ({
 		t: (key: string) => key,
-		i18n: { changeLanguage: jest.fn() }
+		i18n: { changeLanguage: jest.fn(), language: "en" }
 	})
 }));
 
@@ -27,16 +39,16 @@ describe("Dashboard WebSocket handling", () => {
 		const data = [
 			{
 				AgeGroup: "25",
-				longitude: 1,
-				latitude: 2,
+				longitude: -121.9,
+				latitude: 37.3,
 				Sex: "male",
 				DistanceMetric: 3,
 				Symptoms: ["fever"]
 			},
 			{
 				AgeGroup: "25",
-				longitude: 4,
-				latitude: 5,
+				longitude: -122.0,
+				latitude: 37.7,
 				Sex: "female",
 				DistanceMetric: 6,
 				Symptoms: ["none"]
