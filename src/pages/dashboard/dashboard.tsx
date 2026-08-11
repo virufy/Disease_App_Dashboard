@@ -27,6 +27,43 @@ interface HealthDataEntry {
 	Symptoms: string[];
 }
 
+export const filterHealthData = (
+	healthData: HealthDataEntry[],
+	selectedLocation: LocationKey,
+	selectedSymptom: string
+): HealthDataEntry[] => {
+	const locationBounds: Record<
+		LocationKey,
+		{ minLat: number; maxLat: number; minLng: number; maxLng: number }
+	> = {
+		siliconValley: {
+			minLat: 36.9,
+			maxLat: 37.8,
+			minLng: -122.5,
+			maxLng: -121.3
+		},
+		dubai: { minLat: 24.8, maxLat: 25.6, minLng: 54.8, maxLng: 55.8 }
+	};
+
+	const bounds = locationBounds[selectedLocation];
+
+	return healthData.filter((entry) => {
+		const matchesLocation =
+			entry.latitude >= bounds.minLat &&
+			entry.latitude <= bounds.maxLat &&
+			entry.longitude >= bounds.minLng &&
+			entry.longitude <= bounds.maxLng;
+
+		const matchesSymptom =
+			selectedSymptom === "All" ||
+			(entry.Symptoms || []).some(
+				(symptom) => symptom.toLowerCase() === selectedSymptom.toLowerCase()
+			);
+
+		return matchesLocation && matchesSymptom;
+	});
+};
+
 const ageGroupLabels = [
 	"<20",
 	"20-30",
@@ -140,15 +177,22 @@ const Dashboard: React.FC = () => {
 
 	const { t, i18n } = useTranslation();
 
-	const sicknessData = processSicknessData(healthData);
-	const genderSicknessData = processGenderSicknessData(healthData) || [
+	const filteredHealthData = filterHealthData(
+		healthData,
+		selectedLocation,
+		selectedSymptom
+	);
+	const sicknessData = processSicknessData(filteredHealthData);
+	const genderSicknessData = processGenderSicknessData(filteredHealthData) || [
 		{ name: "Sick Male", value: 0 },
 		{ name: "Non-Sick Male", value: 0 },
 		{ name: "Sick Female", value: 0 },
 		{ name: "Non-Sick Female", value: 0 }
 	];
 
-	const distanceMetrics = healthData.map((entry) => entry.DistanceMetric);
+	const distanceMetrics = filteredHealthData.map(
+		(entry) => entry.DistanceMetric
+	);
 
 	const connectWebSocket = useCallback(() => {
 		const websocketURL = process.env.REACT_APP_WEBSOCKET_URL?.trim();
@@ -260,8 +304,7 @@ const Dashboard: React.FC = () => {
 				const fullList = [{ id: "All", label: "All 🔴" }, ...withoutAll];
 				setSymptomsList(fullList);
 
-				// Set default selected symptom to the first actual symptom (or "All" if none)
-				setSelectedSymptom(withoutAll.length > 0 ? withoutAll[0].id : "All");
+				setSelectedSymptom("All");
 			} catch (error) {
 				console.error("Failed to load symptoms", error);
 			} finally {
@@ -299,7 +342,7 @@ const Dashboard: React.FC = () => {
 						lat={LOCATIONS[selectedLocation].lat}
 						lon={LOCATIONS[selectedLocation].lon}
 						zoom={LOCATIONS[selectedLocation].zoom}
-						points={healthData.map((entry) => ({
+						points={filteredHealthData.map((entry) => ({
 							lat: entry.latitude,
 							lng: entry.longitude,
 							intensity: 10
@@ -338,7 +381,9 @@ const Dashboard: React.FC = () => {
 											$active={selectedSymptom === symptom.id}
 											onClick={() => setSelectedSymptom(symptom.id)}
 										>
-											{t(`symptoms.${symptom.id}`)}
+											{symptom.id === "All"
+												? "All"
+												: t(`symptoms.${symptom.id}`)}
 										</Chip>
 									))}
 								</ChipRow>
