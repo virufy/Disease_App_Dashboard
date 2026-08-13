@@ -30,7 +30,7 @@ interface HealthDataEntry {
 export const filterHealthData = (
 	healthData: HealthDataEntry[],
 	selectedLocation: LocationKey,
-	selectedSymptom: string
+	selectedSymptoms: string | string[]
 ): HealthDataEntry[] => {
 	const locationBounds: Record<
 		LocationKey,
@@ -46,6 +46,14 @@ export const filterHealthData = (
 	};
 
 	const bounds = locationBounds[selectedLocation];
+	const normalizedSelectedSymptoms = (
+		Array.isArray(selectedSymptoms)
+			? selectedSymptoms
+			: selectedSymptoms
+				? [selectedSymptoms]
+				: []
+	).map((symptom) => symptom.toLowerCase());
+	const hasAnySelectedSymptom = normalizedSelectedSymptoms.length > 0;
 
 	return healthData.filter((entry) => {
 		const matchesLocation =
@@ -55,9 +63,10 @@ export const filterHealthData = (
 			entry.longitude <= bounds.maxLng;
 
 		const matchesSymptom =
-			selectedSymptom === "All" ||
-			(entry.Symptoms || []).some(
-				(symptom) => symptom.toLowerCase() === selectedSymptom.toLowerCase()
+			!hasAnySelectedSymptom ||
+			normalizedSelectedSymptoms.includes("all") ||
+			(entry.Symptoms || []).some((symptom) =>
+				normalizedSelectedSymptoms.includes(symptom.toLowerCase())
 			);
 
 		return matchesLocation && matchesSymptom;
@@ -165,7 +174,7 @@ const Dashboard: React.FC = () => {
 		useState<LocationKey>("siliconValley");
 	const [loadingSymptoms, setLoadingSymptoms] = useState(true);
 	const [symptomsList, setSymptomsList] = useState<Symptom[]>([]);
-	const [selectedSymptom, setSelectedSymptom] = useState<string>("All");
+	const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
 
 	const ws = useRef<WebSocket | null>(null);
 	const reconnectTimerRef = useRef<number | null>(null);
@@ -180,7 +189,7 @@ const Dashboard: React.FC = () => {
 	const filteredHealthData = filterHealthData(
 		healthData,
 		selectedLocation,
-		selectedSymptom
+		selectedSymptoms
 	);
 	const sicknessData = processSicknessData(filteredHealthData);
 	const genderSicknessData = processGenderSicknessData(filteredHealthData) || [
@@ -297,14 +306,12 @@ const Dashboard: React.FC = () => {
 	useEffect(() => {
 		const loadSymptoms = async () => {
 			try {
-				const symptoms = await fetchSymptoms();
-				setSymptomsList(symptoms);
-
+				const rawSymptoms = (await fetchSymptoms()) || [];
+				const symptoms = Array.isArray(rawSymptoms) ? rawSymptoms : [];
 				const withoutAll = symptoms.filter((s) => s.id !== "All");
 				const fullList = [{ id: "All", label: "All 🔴" }, ...withoutAll];
 				setSymptomsList(fullList);
-
-				setSelectedSymptom("All");
+				setSelectedSymptoms([]);
 			} catch (error) {
 				console.error("Failed to load symptoms", error);
 			} finally {
@@ -317,6 +324,19 @@ const Dashboard: React.FC = () => {
 	const handleLanguageChange = useCallback((language: "en" | "ar" | "ja") => {
 		setSelectedLanguage(language);
 		console.log(`Language changed to: ${language}`);
+	}, []);
+
+	const toggleSymptom = useCallback((symptomId: string) => {
+		setSelectedSymptoms((prevSelected) => {
+			if (symptomId === "All") {
+				return [];
+			}
+
+			const nextSelected = prevSelected.filter((id) => id !== "All");
+			return nextSelected.includes(symptomId)
+				? nextSelected.filter((id) => id !== symptomId)
+				: [...nextSelected, symptomId];
+		});
 	}, []);
 
 	return (
@@ -375,17 +395,24 @@ const Dashboard: React.FC = () => {
 								</div>
 							) : (
 								<ChipRow>
-									{symptomsList.map((symptom) => (
-										<Chip
-											key={symptom.id}
-											$active={selectedSymptom === symptom.id}
-											onClick={() => setSelectedSymptom(symptom.id)}
-										>
-											{symptom.id === "All"
-												? "All"
-												: t(`symptoms.${symptom.id}`)}
-										</Chip>
-									))}
+									{symptomsList.map((symptom) => {
+										const isSelected =
+											symptom.id === "All"
+												? selectedSymptoms.length === 0
+												: selectedSymptoms.includes(symptom.id);
+
+										return (
+											<Chip
+												key={symptom.id}
+												$active={isSelected}
+												onClick={() => toggleSymptom(symptom.id)}
+											>
+												{symptom.id === "All"
+													? "All"
+													: t(`symptoms.${symptom.id}`)}
+											</Chip>
+										);
+									})}
 								</ChipRow>
 							)}
 						</FilterGroup>

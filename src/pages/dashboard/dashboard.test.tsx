@@ -55,8 +55,43 @@ describe("Dashboard WebSocket handling", () => {
 			}
 		] as any[];
 
-		const filtered = filterHealthData(data, "siliconValley", "fever");
+		const filtered = filterHealthData(data, "siliconValley", ["fever"]);
 		expect(filtered).toHaveLength(1);
 		expect(filtered[0].Symptoms).toEqual(["fever"]);
+	});
+
+	it("includes entries matching any selected symptom and keeps all when no symptom is selected", () => {
+		const data = [
+			{
+				AgeGroup: "25",
+				longitude: -121.9,
+				latitude: 37.3,
+				Sex: "male",
+				DistanceMetric: 3,
+				Symptoms: ["fever"]
+			},
+			{
+				AgeGroup: "35",
+				longitude: -121.9,
+				latitude: 37.3,
+				Sex: "male",
+				DistanceMetric: 8,
+				Symptoms: ["cough"]
+			},
+			{
+				AgeGroup: "45",
+				longitude: -122.0,
+				latitude: 37.7,
+				Sex: "female",
+				DistanceMetric: 2,
+				Symptoms: ["none"]
+			}
+		] as any[];
+
+		expect(
+			filterHealthData(data, "siliconValley", ["fever", "cough"]).length
+		).toBe(2);
+		expect(filterHealthData(data, "siliconValley", []).length).toBe(3);
+		expect(filterHealthData(data, "siliconValley", ["all"]).length).toBe(3);
 	});
 });
