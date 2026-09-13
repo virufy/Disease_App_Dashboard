@@ -9,7 +9,20 @@ import {
 	ChipRow,
 	Chip,
 	FilterLabel,
-	FloatingCharts
+	FloatingCharts,
+	TopBar,
+	BrandPanel,
+	BrandMark,
+	BrandText,
+	BrandTitle,
+	BrandSubtitle,
+	LiveBadge,
+	LiveDot,
+	KpiRow,
+	KpiCard,
+	KpiLabel,
+	KpiValue,
+	KpiSub
 } from "../../styles/DashboardStyles";
 
 import BottomCharts from "../../components/charts/BottomCharts";
@@ -42,7 +55,8 @@ export const filterHealthData = (
 			minLng: -122.5,
 			maxLng: -121.3
 		},
-		dubai: { minLat: 24.8, maxLat: 25.6, minLng: 54.8, maxLng: 55.8 }
+		dubai: { minLat: 24.8, maxLat: 25.6, minLng: 54.8, maxLng: 55.8 },
+		madinah: { minLat: 24.2, maxLat: 24.8, minLng: 39.3, maxLng: 39.9 }
 	};
 
 	const bounds = locationBounds[selectedLocation];
@@ -203,6 +217,31 @@ const Dashboard: React.FC = () => {
 		(entry) => entry.DistanceMetric
 	);
 
+	/* ── Live KPIs for the stakeholder header ─────────────────────── */
+	const totalCases = filteredHealthData.length;
+	const sickCount = filteredHealthData.filter(
+		(entry) => entry.Symptoms && !entry.Symptoms.includes("none")
+	).length;
+	const sickRate = totalCases ? Math.round((sickCount / totalCases) * 100) : 0;
+	const citiesMonitored = Object.keys(LOCATIONS).length;
+
+	const symptomTally = filteredHealthData.reduce<Record<string, number>>(
+		(acc, entry) => {
+			(entry.Symptoms || []).forEach((symptom) => {
+				const key = symptom.toLowerCase();
+				if (key === "none") return;
+				acc[key] = (acc[key] || 0) + 1;
+			});
+			return acc;
+		},
+		{}
+	);
+	const topSymptomId =
+		Object.entries(symptomTally).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+	const topSymptomLabel = topSymptomId
+		? t(`symptoms.${topSymptomId}`, { defaultValue: topSymptomId })
+		: "—";
+
 	const connectWebSocket = useCallback(() => {
 		const websocketURL = process.env.REACT_APP_WEBSOCKET_URL?.trim();
 
@@ -352,6 +391,9 @@ const Dashboard: React.FC = () => {
 			<SideMenu
 				selectedLanguage={selectedLanguage}
 				onLanguageChange={handleLanguageChange}
+				totalCases={totalCases}
+				sickRate={sickRate}
+				citiesLive={citiesMonitored}
 			/>
 
 			{/* ------------------ MAIN DASHBOARD CONTENT ------------------ */}
@@ -368,6 +410,81 @@ const Dashboard: React.FC = () => {
 							intensity: 10
 						}))}
 					/>
+
+					{/* ------------------ STAKEHOLDER HEADER ------------------ */}
+					<TopBar>
+						<BrandPanel>
+							<BrandMark>🩺</BrandMark>
+							<BrandText>
+								<BrandTitle>
+									{t("brand.title", { defaultValue: "Disease Map" })}
+								</BrandTitle>
+								<BrandSubtitle>
+									{t("brand.subtitle", {
+										defaultValue: "Live respiratory surveillance"
+									})}
+								</BrandSubtitle>
+								<LiveBadge>
+									<LiveDot />
+									{t("brand.live", { defaultValue: "Live" })}
+								</LiveBadge>
+							</BrandText>
+						</BrandPanel>
+
+						<KpiRow>
+							<KpiCard style={{ ["--dm-accent" as any]: "#2563eb" }}>
+								<KpiLabel>
+									{t("dashboard.kpi.submissions", { defaultValue: "Submissions" })}
+								</KpiLabel>
+								<KpiValue>{totalCases.toLocaleString()}</KpiValue>
+								<KpiSub>{t("dashboard.locations." + selectedLocation)}</KpiSub>
+							</KpiCard>
+
+							<KpiCard
+								style={{
+									["--dm-accent" as any]:
+										sickRate >= 35
+											? "#ef4444"
+											: sickRate >= 15
+												? "#f59e0b"
+												: "#10b981"
+								}}
+							>
+								<KpiLabel>
+									{t("dashboard.kpi.sickRate", { defaultValue: "Sick Rate" })}
+								</KpiLabel>
+								<KpiValue>{sickRate}%</KpiValue>
+								<KpiSub>
+									{sickCount.toLocaleString()}{" "}
+									{t("dashboard.kpi.cases", { defaultValue: "cases" })}
+								</KpiSub>
+							</KpiCard>
+
+							<KpiCard style={{ ["--dm-accent" as any]: "#0ea5a4" }}>
+								<KpiLabel>
+									{t("dashboard.kpi.topSymptom", { defaultValue: "Top Symptom" })}
+								</KpiLabel>
+								<KpiValue style={{ fontSize: "18px", paddingTop: "4px" }}>
+									{topSymptomLabel}
+								</KpiValue>
+								<KpiSub>
+									{t("dashboard.kpi.mostReported", {
+										defaultValue: "most reported"
+									})}
+								</KpiSub>
+							</KpiCard>
+
+							<KpiCard style={{ ["--dm-accent" as any]: "#4f46e5" }}>
+								<KpiLabel>
+									{t("dashboard.kpi.cities", { defaultValue: "Cities" })}
+								</KpiLabel>
+								<KpiValue>{citiesMonitored}</KpiValue>
+								<KpiSub>
+									{t("dashboard.kpi.regionsLive", { defaultValue: "regions live" })}
+								</KpiSub>
+							</KpiCard>
+						</KpiRow>
+					</TopBar>
 
 					<MapControls>
 						{/* Location group */}

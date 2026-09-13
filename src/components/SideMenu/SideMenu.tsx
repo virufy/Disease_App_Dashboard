@@ -7,9 +7,15 @@ import {
 	SubMenuItem,
 	TestDataText,
 	SideMenuFooter,
+	FooterCaption,
 	QRLink,
 	VirufyLogoPNG,
-	QRCode
+	QRCode,
+	SideSectionLabel,
+	StatGrid,
+	StatTile,
+	StatTileLabel,
+	StatTileValue
 } from "./SideMenuStyles";
 import { IoLanguage, IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
@@ -17,11 +23,17 @@ import { useTranslation } from "react-i18next";
 interface SideMenuProps {
 	selectedLanguage: "en" | "ar" | "ja";
 	onLanguageChange: (lang: "en" | "ar" | "ja") => void;
+	totalCases?: number;
+	sickRate?: number;
+	citiesLive?: number;
 }
 
 const SideMenu: React.FC<SideMenuProps> = ({
 	selectedLanguage,
-	onLanguageChange
+	onLanguageChange,
+	totalCases = 0,
+	sickRate = 0,
+	citiesLive = 0
 }) => {
 	const [isLangOpen, setIsLangOpen] = useState(false);
 
@@ -49,7 +61,35 @@ const SideMenu: React.FC<SideMenuProps> = ({
 			{/* Test data text */}
 			<TestDataText>{t("menu.testData")}</TestDataText>
 
+			{/* Live overview stats */}
+			<SideSectionLabel>
+				{t("menu.overview", { defaultValue: "Overview" })}
+			</SideSectionLabel>
+			<StatGrid>
+				<StatTile>
+					<StatTileLabel>
+						{t("dashboard.kpi.submissions", { defaultValue: "Submissions" })}
+					</StatTileLabel>
+					<StatTileValue>{totalCases.toLocaleString()}</StatTileValue>
+				</StatTile>
+				<StatTile>
+					<StatTileLabel>
+						{t("dashboard.kpi.sickRate", { defaultValue: "Sick Rate" })}
+					</StatTileLabel>
+					<StatTileValue>{sickRate}%</StatTileValue>
+				</StatTile>
+				<StatTile>
+					<StatTileLabel>
+						{t("dashboard.kpi.cities", { defaultValue: "Cities" })}
+					</StatTileLabel>
+					<StatTileValue>{citiesLive}</StatTileValue>
+				</StatTile>
+			</StatGrid>
+
 			{/* Language menu */}
+			<SideSectionLabel>
+				{t("menu.settings", { defaultValue: "Settings" })}
+			</SideSectionLabel>
 			<MenuItem onClick={toggleLangMenu}>
 				<span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
 					<IoLanguage size={18} />
@@ -84,6 +124,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
 				<QRLink href="/dubai-app" target="_blank" rel="noopener noreferrer">
 					<QRCode />
 				</QRLink>
+				<FooterCaption>
+					{t("menu.scanToContribute", {
+						defaultValue: "Scan to contribute data"
+					})}
+				</FooterCaption>
 			</SideMenuFooter>
 		</SideMenuContainer>
 	);

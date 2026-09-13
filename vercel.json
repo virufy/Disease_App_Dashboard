@@ -1,0 +1,8 @@
+{
+  "redirects": [
+    { "source": "/dubai-map", "destination": "/disease-map", "permanent": true },
+    { "source": "/dubai-map/:path*", "destination": "/disease-map/:path*", "permanent": true },
+    { "source": "/dubai", "destination": "/disease-map", "permanent": true },
+    { "source": "/dubai/:path*", "destination": "/disease-map/:path*", "permanent": true }
+  ]
+}

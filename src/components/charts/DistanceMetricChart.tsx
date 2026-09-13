@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComposedChart, Scatter, Line, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Area } from 'recharts';
+import { ComposedChart, Scatter, Line, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContainer, Area, CartesianGrid } from 'recharts';
 
 interface DistanceMetricChartProps {
   mean: number;
@@ -59,16 +59,27 @@ const CustomTooltip = ({ active, payload, label, language }: any) => {
     return (
       <div
         style={{
-          backgroundColor: 'white',
-          border: '1px solid #ccc',
-          padding: '5px',
+          background: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(15,23,42,0.08)',
+          borderRadius: 12,
+          padding: '9px 12px',
+          boxShadow: '0 14px 34px -14px rgba(15,23,42,0.45)',
+          fontSize: 12.5,
           textAlign: isRTL ? 'right' : 'left',
           direction: isRTL ? 'rtl' : 'ltr',
         }}
       >
-        <p style={{ color: '#ff5632' }}>{`${t.tooltipDistance}: ${label.toFixed(2)}`}</p>
+        <p style={{ margin: '2px 0', color: '#334155' }}>
+          {`${t.tooltipDistance}: `}
+          <b style={{ color: '#0f172a' }}>{label.toFixed(2)}</b>
+        </p>
         {bellCurveValue && (
-          <p style={{ color: '#4BC0C0' }}>{`${t.tooltipProbability}: ${bellCurveValue.value.toFixed(4)}`}</p>
+          <p style={{ margin: '2px 0', color: '#0d9488' }}>
+            {`${t.tooltipProbability}: `}
+            <b>{bellCurveValue.value.toFixed(4)}</b>
+          </p>
         )}
       </div>
     );
@@ -126,7 +137,9 @@ const renderYAxisTick = (props: any) => {
         dx={dx}
         dy={4}
         textAnchor={isRTL ? 'end' : 'start'}
-        fill="#666"
+        fill="#94a3b8"
+        fontSize={11}
+        fontWeight={600}
       >
         {payload.value.toFixed(2)}
       </text>
@@ -137,23 +150,36 @@ const renderYAxisTick = (props: any) => {
   return (
     <ResponsiveContainer width="100%" height="93%">
       <ComposedChart margin={chartMargin}>
+        <defs>
+          <linearGradient id="bellGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2dd4bf" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="#2dd4bf" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} stroke="#eef2f7" strokeDasharray="4 4" />
         <XAxis
           dataKey="x"
-          label={{ value: t.distanceMetric, position: 'insideBottom', offset: -15, }}
+          label={{ value: t.distanceMetric, position: 'insideBottom', offset: -15, fill: '#94a3b8', fontSize: 11 }}
           type="number"
           domain={['dataMin', 'dataMax']}
           ticks={ticks}
           tickFormatter={(value) => value.toFixed(2)}
           tick={renderCustomizedTick}
+          axisLine={false}
+          tickLine={false}
         />
         <YAxis
           orientation={isRTL ? 'right' : 'left'}
+          axisLine={false}
+          tickLine={false}
           label={{
             value: t.probabilityDensity,
             angle: -90,
             position: isRTL ? 'insideRight' : 'insideLeft',
             offset: 0,
             dy: isRTL ? 40 : 60,
+            fill: '#94a3b8',
+            fontSize: 11,
           }}
           tick={renderYAxisTick}
         />
@@ -164,9 +190,11 @@ const renderYAxisTick = (props: any) => {
           type="monotone"
           dataKey="y"
           data={bellCurveData}
-          fill="rgba(75, 192, 192, 0.2)"
-          stroke="#4BC0C0"
+          fill="url(#bellGrad)"
+          stroke="#0d9488"
+          strokeWidth={2}
           name="Probability"
+          animationDuration={700}
         />
 
         {distanceMetrics.map((metric, index) => {

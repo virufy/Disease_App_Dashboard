@@ -1,13 +1,12 @@
-import React from 'react';
-import { GlobalStyle } from './styles/globalStyle';
-import Dashboard from './pages/dashboard/dashboard';
+import React from "react";
+import { DiseaseProvider } from "./state/DiseaseContext";
+import DiseaseDashboard from "./pages/disease/DiseaseDashboard";
 
 const App: React.FC = () => {
   return (
-    <>
-      <GlobalStyle />
-      <Dashboard />
-    </>
+    <DiseaseProvider>
+      <DiseaseDashboard />
+    </DiseaseProvider>
   );
 };
 

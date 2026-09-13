@@ -1,7 +1,15 @@
 {
+  "brand": {
+    "title": "Disease Map",
+    "subtitle": "Live respiratory surveillance",
+    "live": "Live"
+  },
   "menu": {
     "language": "Language",
-    "testData": "Test data"
+    "testData": "Test data",
+    "overview": "Overview",
+    "settings": "Settings",
+    "scanToContribute": "Scan to contribute data"
   },
   "languages": {
     "english": "English",
@@ -24,9 +32,21 @@
     "coughStatsTitle": "Cough Statistics",
     "location": "Location",
     "loadingSymptoms": "Loading symptoms",
+    "awaitingTitle": "Awaiting live data for this region",
+    "awaitingHint": "Charts populate automatically as submissions arrive — or select another city.",
     "locations": {
       "siliconValley": "Silicon Valley",
-      "dubai": "Dubai"
+      "dubai": "Dubai",
+      "madinah": "Madinah"
+    },
+    "kpi": {
+      "submissions": "Submissions",
+      "sickRate": "Sick Rate",
+      "cases": "cases",
+      "topSymptom": "Top Symptom",
+      "mostReported": "most reported",
+      "cities": "Cities",
+      "regionsLive": "regions live"
     }
   },
   "sicknessKeys": {
@@ -38,5 +58,142 @@
     "nonSickMale": "Non-Sick Male",
     "sickFemale": "Sick Female",
     "nonSickFemale": "Non-Sick Female"
+  },
+  "nodes": {
+    "siliconValley": "Silicon Valley",
+    "dubai": "Dubai",
+    "madinah": "Madinah",
+    "mecca": "Mecca",
+    "jeddah": "Jeddah (Gateway)"
+  },
+  "dm": {
+    "appName": "Disease Map",
+    "subtitle": "Regional Respiratory Disease Surveillance",
+    "live": "Live",
+    "lastUpdated": "Last updated",
+    "methodology": "Methodology",
+    "language": "Language",
+    "metrics": {
+      "screenings": "Screenings conducted",
+      "highRisk": "High-risk cases flagged",
+      "positivity": "High-risk / positivity rate",
+      "undetected": "Est. undetected cases",
+      "undetectedHint": "the value of earlier detection",
+      "leadTime": "Avg lead time gained",
+      "days": "days",
+      "period": "period to date"
+    },
+    "map": {
+      "title": "Live Surveillance Map",
+      "prevalence": "Prevalence field",
+      "allCities": "All"
+    },
+    "tier": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "elevated": "Elevated",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "legend": {
+      "title": "Legend",
+      "actual": "Solid fill = actual (measured)",
+      "predicted": "Dashed ring = predicted (forecast)",
+      "tier": "Border colour = risk tier",
+      "field": "Shading = case prevalence",
+      "cluster": "Pulsing ring = emerging cluster",
+      "flowHigh": "High-risk transmission corridor",
+      "flowAlt": "Lower-risk alternate"
+    },
+    "pop": {
+      "actual": "Actual",
+      "predicted": "Predicted",
+      "tier": "Risk tier",
+      "lead": "Lead time",
+      "leadDays": "{{n}}d early warning",
+      "trend": "Recent trend"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "capacity": "Capacity",
+      "outbreak": "Outbreak",
+      "air": "Air quality",
+      "none": "No active alerts at this timeline position."
+    },
+    "forecast": {
+      "title": "Forecast scenarios",
+      "hint": "Simulate a surge — the map, alerts and recommended deployment update live."
+    },
+    "scenario": {
+      "none": "Baseline",
+      "hajjInflux": "Hajj peak influx",
+      "dustStorm": "Dust-storm week",
+      "newVariant": "New variant"
+    },
+    "season": {
+      "title": "Season / event",
+      "baseline": "Baseline",
+      "hajj": "Hajj season",
+      "umrah": "Umrah peak",
+      "dust": "Dust season",
+      "winter": "Winter respiratory"
+    },
+    "sensor": {
+      "title": "Live sensor feed",
+      "cough": "Cough-audio submissions",
+      "ai": "AI screening throughput",
+      "clinical": "Clinical confirmations",
+      "ward": "Respiratory-ward occupancy",
+      "env": "Environmental",
+      "perDay": "/day today",
+      "analyzed": "recordings analysed",
+      "confirmed": "partner-clinic positives",
+      "occupancy": "avg across cities"
+    },
+    "chart": {
+      "eva": "Expected vs Actual respiratory cases",
+      "evaPredicted": "Predicted (forecast)",
+      "evaActual": "Detected (confirmed)",
+      "evaUnit": "cases / 100k · regional average"
+    },
+    "model": {
+      "title": "Model performance",
+      "auc": "AUC",
+      "sensitivity": "Sensitivity",
+      "specificity": "Specificity",
+      "inSample": "in-sample",
+      "heldOut": "held-out",
+      "note": "Respiratory-AI model metrics — not diagnostic guarantees."
+    },
+    "table": {
+      "title": "Live node status",
+      "node": "Node",
+      "city": "City",
+      "actual": "Actual",
+      "predicted": "Predicted",
+      "tier": "Risk tier",
+      "lead": "Lead time"
+    },
+    "timeline": {
+      "play": "Play",
+      "pause": "Pause",
+      "freeze": "Freeze motion on pause",
+      "speed": "Speed"
+    },
+    "methodologyNote": "Node positions are real. All time-series, live-feed values and forecasts are simulated for demonstration, and will be replaced with live Virufy cough-screening data, partner-clinic confirmations and environmental APIs before any technical or clinical audience. Figures shown are model metrics, not confirmed clinical results."
+  },
+  "alerts": {
+    "capacity": {
+      "title": "Forecast surge outpaces screening capacity",
+      "detail": "{{city}}: forecast exceeds detected by {{gap}}/100k — {{lead}} days lead time to add screening stations."
+    },
+    "outbreak": {
+      "title": "Rising respiratory cluster detected",
+      "detail": "{{city}}: detected rate {{rate}}/100k and climbing."
+    },
+    "air": {
+      "title": "PM2.5 / dust compounding respiratory risk",
+      "detail": "{{city}}: air quality is worsening respiratory exposure."
+    }
   }
 }

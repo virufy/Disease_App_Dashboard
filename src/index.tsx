@@ -6,6 +6,16 @@ import reportWebVitals from "./reportWebVitals";
 import "./i18n";
 // import { AppProvider } from "./ThemeProviderWrapper";
 
+// Legacy-link redirect: /dubai-map and /dubai are no longer canonical.
+// (Client-side fallback — the real 301 redirect should also be set at the host.)
+(() => {
+  const { pathname, search, hash } = window.location;
+  if (/\/dubai(-map)?(\/|$)/i.test(pathname)) {
+    const next = pathname.replace(/\/dubai(-map)?/i, "/disease-map");
+    window.history.replaceState(null, "", next + search + hash);
+  }
+})();
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
 );

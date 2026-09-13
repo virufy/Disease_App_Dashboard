@@ -1,7 +1,15 @@
 {
+  "brand": {
+    "title": "疾患マップ",
+    "subtitle": "呼吸器のライブ監視",
+    "live": "ライブ"
+  },
   "menu": {
     "language": "言語",
-    "testData": "テストデータ"
+    "testData": "テストデータ",
+    "overview": "概要",
+    "settings": "設定",
+    "scanToContribute": "スキャンしてデータを提供"
   },
   "languages": {
     "english": "English",
@@ -24,9 +32,21 @@
     "coughStatsTitle": "咳の統計",
     "location": "場所",
     "loadingSymptoms": "症状を読み込み中",
+    "awaitingTitle": "この地域のライブデータを待機中",
+    "awaitingHint": "提出データが届き次第、グラフは自動的に更新されます。別の都市も選択できます。",
     "locations": {
       "siliconValley": "シリコンバレー",
-      "dubai": "ドバイ"
+      "dubai": "ドバイ",
+      "madinah": "マディーナ"
+    },
+    "kpi": {
+      "submissions": "提出数",
+      "sickRate": "有症率",
+      "cases": "件",
+      "topSymptom": "主な症状",
+      "mostReported": "最多報告",
+      "cities": "都市",
+      "regionsLive": "稼働地域"
     }
   },
   "sicknessKeys": {

@@ -26,9 +26,12 @@ const MapComponent: React.FC<MapProps> = React.memo(
         zoom,
       });
 
+      // OSM tiles (no API key) — desaturated to a professional light-gray
+      // look via the .leaflet-tile-pane CSS filter in index.css
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: "© OpenStreetMap contributors",
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapRef.current);
 
       const handleResize = () => {
@@ -64,10 +67,16 @@ const MapComponent: React.FC<MapProps> = React.memo(
       heatLayerRef.current = L.heatLayer(
         points.map((p) => [p.lat, p.lng, p.intensity]),
         {
-          radius: 30,
-          blur: 15,
+          radius: 34,
+          blur: 22,
           maxZoom: 15,
-          gradient: { 0.4: "blue", 0.65: "lime", 1: "red" },
+          minOpacity: 0.35,
+          gradient: {
+            0.2: "#22d3ee",
+            0.45: "#84cc16",
+            0.7: "#f59e0b",
+            1.0: "#ef4444",
+          },
         },
       );
 

@@ -14,6 +14,12 @@ export const LOCATIONS = {
     lon: 55.2708,
     zoom: 10,
   },
+  madinah: {
+    key: "madinah",
+    lat: 24.4686,
+    lon: 39.6142,
+    zoom: 10,
+  },
 } as const;
 
 export type LocationKey = keyof typeof LOCATIONS;
