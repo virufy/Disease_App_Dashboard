@@ -1,91 +1,60 @@
 {
-  "brand": {
-    "title": "Disease Map",
-    "subtitle": "Live respiratory surveillance",
-    "live": "Live"
-  },
-  "menu": {
-    "language": "Language",
-    "testData": "Test data",
-    "overview": "Overview",
-    "settings": "Settings",
-    "scanToContribute": "Scan to contribute data"
-  },
-  "languages": {
-    "english": "English",
-    "arabic": "العربية (Arabic)",
-    "japanese": "日本語 (Japanese)"
-  },
   "symptoms": {
-    "All": "All 🔴",
-    "heavysmoker": "Heavy Smoker 🚬",
-    "cold": "Cold 🤒",
-    "influenza": "Influenza 😷",
-    "covid": "COVID 🤧",
-    "sars": "SARS 🦠",
-    "rsv": "RSV 🏥"
-  },
-  "dashboard": {
-    "symptomsLabel": "Symptoms",
-    "ageTitle": "Age",
-    "genderTitle": "Gender",
-    "coughStatsTitle": "Cough Statistics",
-    "location": "Location",
-    "loadingSymptoms": "Loading symptoms",
-    "awaitingTitle": "Awaiting live data for this region",
-    "awaitingHint": "Charts populate automatically as submissions arrive — or select another city.",
-    "locations": {
-      "siliconValley": "Silicon Valley",
-      "dubai": "Dubai",
-      "madinah": "Madinah"
-    },
-    "kpi": {
-      "submissions": "Submissions",
-      "sickRate": "Sick Rate",
-      "cases": "cases",
-      "topSymptom": "Top Symptom",
-      "mostReported": "most reported",
-      "cities": "Cities",
-      "regionsLive": "regions live"
-    }
-  },
-  "sicknessKeys": {
-    "sick": "Sick",
-    "notSick": "Not Sick"
-  },
-  "gender": {
-    "sickMale": "Sick Male",
-    "nonSickMale": "Non-Sick Male",
-    "sickFemale": "Sick Female",
-    "nonSickFemale": "Non-Sick Female"
+    "All": "All",
+    "heavysmoker": "Heavy Smoker",
+    "cold": "Cold",
+    "influenza": "Influenza",
+    "covid": "COVID",
+    "sars": "SARS",
+    "rsv": "RSV",
+    "none": "No symptoms"
   },
   "nodes": {
     "siliconValley": "Silicon Valley",
     "dubai": "Dubai",
     "madinah": "Madinah",
     "mecca": "Mecca",
-    "jeddah": "Jeddah (Gateway)"
+    "jeddah": "Jeddah (Gateway)",
+    "other": "Other regions"
   },
   "dm": {
     "appName": "Disease Map",
-    "subtitle": "Regional Respiratory Disease Surveillance",
+    "subtitle": "Respiratory disease monitoring, powered by cough screening",
     "live": "Live",
-    "lastUpdated": "Last updated",
     "methodology": "Methodology",
     "language": "Language",
+    "header": {
+      "submissions": "submissions"
+    },
+    "status": {
+      "live": "connected",
+      "connecting": "connecting…",
+      "idle": "offline"
+    },
+    "tag": {
+      "real": "Real",
+      "preview": "Preview",
+      "riskPreview": "Risk: preview",
+      "modeled": "Modeled",
+      "modeledLine": "Projection: modeled",
+      "illustrative": "Illustrative",
+      "testData": "Test data"
+    },
     "metrics": {
-      "screenings": "Screenings conducted",
-      "highRisk": "High-risk cases flagged",
-      "positivity": "High-risk / positivity rate",
-      "undetected": "Est. undetected cases",
-      "undetectedHint": "the value of earlier detection",
-      "leadTime": "Avg lead time gained",
-      "days": "days",
-      "period": "period to date"
+      "screenings": "Total screenings",
+      "allLocations": "all locations",
+      "recent": "Recent submissions",
+      "recentSub": "latest arrivals",
+      "locations": "Active locations",
+      "locationsSub": "reporting data",
+      "highRisk": "High-risk cases",
+      "positivity": "High-risk rate",
+      "previewSub": "pending model",
+      "days": "days"
     },
     "map": {
       "title": "Live Surveillance Map",
-      "prevalence": "Prevalence field",
+      "prevalence": "Density overlay",
       "allCities": "All"
     },
     "tier": {
@@ -97,38 +66,37 @@
     },
     "legend": {
       "title": "Legend",
-      "actual": "Solid fill = actual (measured)",
-      "predicted": "Dashed ring = predicted (forecast)",
-      "tier": "Border colour = risk tier",
-      "field": "Shading = case prevalence",
-      "cluster": "Pulsing ring = emerging cluster",
-      "flowHigh": "High-risk transmission corridor",
-      "flowAlt": "Lower-risk alternate"
+      "node": "Node size = submission volume",
+      "newSubmission": "Pulse = new submission",
+      "flowHigh": "Modeled transmission corridor"
     },
     "pop": {
-      "actual": "Actual",
-      "predicted": "Predicted",
-      "tier": "Risk tier",
-      "lead": "Lead time",
-      "leadDays": "{{n}}d early warning",
-      "trend": "Recent trend"
+      "submissions": "Submissions",
+      "symptomatic": "Symptomatic",
+      "risk": "Risk tier",
+      "trend": "Submissions trend"
     },
-    "alerts": {
-      "title": "Alerts",
-      "capacity": "Capacity",
-      "outbreak": "Outbreak",
-      "air": "Air quality",
-      "none": "No active alerts at this timeline position."
+    "signal": {
+      "title": "Signals",
+      "none": "No signals at this timeline position.",
+      "capacity": {
+        "title": "Modeled surge may outpace screening capacity",
+        "detail": "{{city}}: a modeled +{{pct}}% surge would need extra screening capacity."
+      },
+      "cluster": {
+        "title": "Elevated high-risk share (preview)",
+        "detail": "{{city}}: {{pct}}% of submissions flagged high-risk by the placeholder model."
+      }
     },
     "forecast": {
       "title": "Forecast scenarios",
-      "hint": "Simulate a surge — the map, alerts and recommended deployment update live."
+      "hint": "Simulate a situation and the modeled projection updates live."
     },
     "scenario": {
       "none": "Baseline",
       "hajjInflux": "Hajj peak influx",
       "dustStorm": "Dust-storm week",
-      "newVariant": "New variant"
+      "newVariant": "Flu-season surge"
     },
     "season": {
       "title": "Season / event",
@@ -139,61 +107,59 @@
       "winter": "Winter respiratory"
     },
     "sensor": {
-      "title": "Live sensor feed",
-      "cough": "Cough-audio submissions",
-      "ai": "AI screening throughput",
-      "clinical": "Clinical confirmations",
-      "ward": "Respiratory-ward occupancy",
-      "env": "Environmental",
-      "perDay": "/day today",
-      "analyzed": "recordings analysed",
-      "confirmed": "partner-clinic positives",
-      "occupancy": "avg across cities"
+      "title": "Live feed",
+      "cough": "Cough submissions",
+      "coughSub": "total received",
+      "symptomatic": "Symptomatic reports",
+      "ofSubs": "of submissions",
+      "highRisk": "High-risk",
+      "highRiskSub": "placeholder model",
+      "air": "Air quality",
+      "dust": "Dust",
+      "airSource": "source: Open-Meteo",
+      "airUnavailable": "unavailable"
     },
     "chart": {
-      "eva": "Expected vs Actual respiratory cases",
-      "evaPredicted": "Predicted (forecast)",
-      "evaActual": "Detected (confirmed)",
-      "evaUnit": "cases / 100k · regional average"
+      "title": "Submissions over time (arrival order)",
+      "actual": "Submissions (actual)",
+      "modeled": "Modeled projection"
     },
-    "model": {
-      "title": "Model performance",
-      "auc": "AUC",
-      "sensitivity": "Sensitivity",
-      "specificity": "Specificity",
-      "inSample": "in-sample",
-      "heldOut": "held-out",
-      "note": "Respiratory-AI model metrics — not diagnostic guarantees."
+    "modeled": {
+      "title": "Modeled scenarios"
+    },
+    "tabs": {
+      "trend": "Trend",
+      "locations": "Locations",
+      "sensors": "Sensors"
     },
     "table": {
-      "title": "Live node status",
-      "node": "Node",
-      "city": "City",
-      "actual": "Actual",
-      "predicted": "Predicted",
+      "title": "Location status",
+      "location": "Location",
+      "submissions": "Submissions",
+      "symptomatic": "Symptomatic",
       "tier": "Risk tier",
-      "lead": "Lead time"
+      "share": "Share",
+      "empty": "Awaiting submissions…"
+    },
+    "feed": {
+      "title": "Live submissions",
+      "empty": "No submissions match this filter.",
+      "asymptomatic": "No symptoms reported",
+      "count": "submissions"
+    },
+    "filter": {
+      "all": "All",
+      "location": "Location",
+      "disease": "Disease"
     },
     "timeline": {
-      "play": "Play",
+      "replay": "Replay",
       "pause": "Pause",
+      "live": "Live",
+      "arrivalOrder": "Arrival order",
       "freeze": "Freeze motion on pause",
       "speed": "Speed"
     },
-    "methodologyNote": "Node positions are real. All time-series, live-feed values and forecasts are simulated for demonstration, and will be replaced with live Virufy cough-screening data, partner-clinic confirmations and environmental APIs before any technical or clinical audience. Figures shown are model metrics, not confirmed clinical results."
-  },
-  "alerts": {
-    "capacity": {
-      "title": "Forecast surge outpaces screening capacity",
-      "detail": "{{city}}: forecast exceeds detected by {{gap}}/100k — {{lead}} days lead time to add screening stations."
-    },
-    "outbreak": {
-      "title": "Rising respiratory cluster detected",
-      "detail": "{{city}}: detected rate {{rate}}/100k and climbing."
-    },
-    "air": {
-      "title": "PM2.5 / dust compounding respiratory risk",
-      "detail": "{{city}}: air quality is worsening respiratory exposure."
-    }
+    "methodologyNote": "This app currently runs on TEST data flowing through the real submission pipeline. Submission volume, location and symptoms come from actual records (audio in S3, metadata in the database). There are no timestamps in the feed, so the timeline replays submissions in arrival order. Risk scoring is a labeled PREVIEW placeholder pending the AI model. Forecast scenarios and seasonal shifts are MODELED; air quality is real (Open-Meteo). All data is aggregated and anonymized. The Test-data label clears automatically once real user submissions replace the test set."
   }
 }

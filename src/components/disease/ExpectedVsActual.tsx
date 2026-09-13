@@ -9,12 +9,12 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ReferenceLine,
   ResponsiveContainer,
 } from "recharts";
+import { FiTrendingUp } from "react-icons/fi";
 import { useDisease } from "../../state/DiseaseContext";
-import { expectedVsActual } from "../../data/simulation";
-import { Panel, PanelHead, PanelTitle } from "../../styles/cc";
+import { volumeSeriesFiltered } from "../../data/derive";
+import { Panel, PanelHead, PanelTitle, Chip } from "../../styles/cc";
 
 const glass: React.CSSProperties = {
   background: "rgba(18,24,38,0.95)",
@@ -28,8 +28,8 @@ const glass: React.CSSProperties = {
 
 const ExpectedVsActual: React.FC = () => {
   const { t } = useTranslation();
-  const { sim, index, frame, dir } = useDisease();
-  const data = expectedVsActual(sim, index);
+  const { filteredAll, total, visibleCount, season, scenario, dir } = useDisease();
+  const data = volumeSeriesFiltered(filteredAll, total, visibleCount, season, scenario);
 
   const Tip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
@@ -40,9 +40,9 @@ const ExpectedVsActual: React.FC = () => {
           <div key={p.dataKey} style={{ display: "flex", gap: 8, alignItems: "center", margin: "2px 0" }}>
             <span style={{ width: 9, height: 9, borderRadius: "50%", background: p.color }} />
             <span style={{ color: "#97a4bd" }}>
-              {p.dataKey === "predicted" ? t("dm.chart.evaPredicted") : t("dm.chart.evaActual")}:
+              {p.dataKey === "modeled" ? t("dm.chart.modeled") : t("dm.chart.actual")}:
             </span>
-            <b style={{ fontFamily: "var(--font-num)" }}>{p.value ?? "—"}</b>
+            <b style={{ fontFamily: "var(--font-num)" }}>{p.value ?? "n/a"}</b>
           </div>
         ))}
       </div>
@@ -50,20 +50,18 @@ const ExpectedVsActual: React.FC = () => {
   };
 
   return (
-    <Panel style={{ display: "flex", flexDirection: "column" }}>
+    <Panel>
       <PanelHead>
-        <PanelTitle>📈 {t("dm.chart.eva")}</PanelTitle>
-        <span style={{ fontSize: 10.5, color: "var(--faint)", fontWeight: 600 }}>
-          {t("dm.chart.evaUnit")}
-        </span>
+        <PanelTitle><FiTrendingUp size={13} /> {t("dm.chart.title")}</PanelTitle>
+        <Chip $tone="#fcd34d">{t("dm.tag.modeledLine")}</Chip>
       </PanelHead>
-      <div style={{ flex: 1, minHeight: 200, padding: "0 8px 10px" }}>
+      <div style={{ height: 280, padding: "0 8px 12px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 8, right: 14, left: -12, bottom: 0 }}>
             <defs>
               <linearGradient id="evaActual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#22d3ee" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#4d8df6" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#4d8df6" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} stroke="rgba(148,163,184,0.12)" strokeDasharray="4 4" />
@@ -73,45 +71,39 @@ const ExpectedVsActual: React.FC = () => {
               tick={{ fontSize: 10, fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              minTickGap={28}
+              minTickGap={26}
             />
             <YAxis
               orientation={dir === "rtl" ? "right" : "left"}
               tick={{ fontSize: 10, fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
-              width={38}
+              width={40}
             />
             <Tooltip content={<Tip />} />
             <Legend
               iconType="plainline"
-              wrapperStyle={{ fontSize: 11, color: "#97a4bd" }}
+              wrapperStyle={{ fontSize: 11 }}
               formatter={(v) => (
                 <span style={{ color: "#97a4bd" }}>
-                  {v === "predicted" ? t("dm.chart.evaPredicted") : t("dm.chart.evaActual")}
+                  {v === "modeled" ? t("dm.chart.modeled") : t("dm.chart.actual")}
                 </span>
               )}
             />
-            <ReferenceLine
-              x={frame.label}
-              stroke="rgba(34,211,238,0.55)"
-              strokeDasharray="3 3"
-              strokeWidth={1.2}
-            />
             <Line
               type="monotone"
-              dataKey="predicted"
+              dataKey="modeled"
               stroke="#f59e0b"
               strokeWidth={2}
               strokeDasharray="6 4"
               dot={false}
               isAnimationActive={false}
-              name="predicted"
+              name="modeled"
             />
             <Area
               type="monotone"
               dataKey="actual"
-              stroke="#22d3ee"
+              stroke="#4d8df6"
               strokeWidth={2.4}
               fill="url(#evaActual)"
               dot={false}

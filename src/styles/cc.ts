@@ -69,10 +69,10 @@ export const Segmented = styled.div`
 
 export const SegButton = styled.button<{ $active?: boolean }>`
   appearance: none;
-  border: 1px solid ${({ $active }) => ($active ? "rgba(34,211,238,0.55)" : "transparent")};
+  border: 1px solid ${({ $active }) => ($active ? "rgba(77, 141, 246,0.55)" : "transparent")};
   background: ${({ $active }) =>
-    $active ? "rgba(34,211,238,0.16)" : "transparent"};
-  color: ${({ $active }) => ($active ? "#a5f3fc" : "var(--muted)")};
+    $active ? "rgba(77, 141, 246,0.16)" : "transparent"};
+  color: ${({ $active }) => ($active ? "#9dc0ff" : "var(--muted)")};
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 700;
@@ -103,9 +103,9 @@ export const Chip = styled.span<{ $tone?: string }>`
   font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: ${({ $tone }) => $tone || "#a5f3fc"};
+  color: ${({ $tone }) => $tone || "#9dc0ff"};
   background: ${({ $tone }) =>
-    $tone ? "rgba(148,163,184,0.12)" : "rgba(34,211,238,0.12)"};
+    $tone ? "rgba(148,163,184,0.12)" : "rgba(77, 141, 246,0.12)"};
   border: 1px solid var(--line);
 `;
 
@@ -137,8 +137,8 @@ export const IconBtn = styled.button`
   transition: all 0.15s ease;
 
   &:hover {
-    border-color: rgba(34, 211, 238, 0.5);
-    color: #a5f3fc;
+    border-color: rgba(77, 141, 246, 0.5);
+    color: #9dc0ff;
   }
   &:focus-visible {
     outline: 2px solid var(--signal);

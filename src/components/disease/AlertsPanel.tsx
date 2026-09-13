@@ -1,8 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { FiAlertTriangle } from "react-icons/fi";
 import { useDisease } from "../../state/DiseaseContext";
-import { alertsForFrame } from "../../data/simulation";
+import { aggregateByLocation, projectionFactor } from "../../data/derive";
+import { FOCUS_LOCATIONS } from "../../data/submissions";
 import { RISK_TIER_MAP } from "../../data/geo";
 import { Panel, PanelHead, PanelTitle, Chip, Num } from "../../styles/cc";
 
@@ -11,53 +13,32 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 260px;
+  max-height: 240px;
   overflow-y: auto;
 `;
-
-const Item = styled.div<{ $color: string }>`
+const Item = styled.div`
   position: relative;
-  padding: 9px 11px 9px 13px;
+  padding: 10px 12px;
   border-radius: 11px;
   background: rgba(9, 12, 20, 0.5);
   border: 1px solid var(--line);
   animation: dm-rise 0.35s ease both;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset-inline-start: 0;
-    top: 8px;
-    bottom: 8px;
-    width: 3px;
-    border-radius: 3px;
-    background: ${({ $color }) => $color};
-  }
   .top {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
     margin-bottom: 3px;
   }
   .ttl {
     font-size: 12px;
     font-weight: 700;
-    color: var(--ink);
   }
   .detail {
     font-size: 11px;
     color: var(--muted);
     line-height: 1.4;
   }
-  .time {
-    font-size: 9.5px;
-    color: var(--faint);
-    font-weight: 600;
-    flex-shrink: 0;
-  }
 `;
-
 const Empty = styled.div`
   padding: 22px 14px;
   text-align: center;
@@ -65,45 +46,76 @@ const Empty = styled.div`
   font-size: 12px;
 `;
 
-const typeTone: Record<string, string> = {
-  capacity: "#a5f3fc",
-  outbreak: "#fca5a5",
-  air: "#fcd34d",
-};
+interface Signal {
+  id: string;
+  kind: "capacity" | "cluster";
+  tag: "modeled" | "preview";
+  color: string;
+  title: string;
+  detail: string;
+}
 
 const AlertsPanel: React.FC = () => {
   const { t } = useTranslation();
-  const { sim, index } = useDisease();
-  const alerts = alertsForFrame(sim, index);
+  const { filtered, season, scenario } = useDisease();
+  const agg = aggregateByLocation(filtered);
+  const proj = projectionFactor(season, scenario);
+
+  const signals: Signal[] = [];
+  for (const id of FOCUS_LOCATIONS) {
+    const a = agg[id];
+    if (!a || a.count === 0) continue;
+    const city = t(`nodes.${id}`, { defaultValue: id });
+
+    // Capacity (MODELED): season/scenario projects a surge beyond current volume
+    if (proj > 1.2) {
+      const surgePct = Math.round((proj - 1) * 100);
+      signals.push({
+        id: `cap-${id}`,
+        kind: "capacity",
+        tag: "modeled",
+        color: "#9dc0ff",
+        title: t("dm.signal.capacity.title"),
+        detail: t("dm.signal.capacity.detail", { city, pct: surgePct }),
+      });
+    }
+    // Cluster (PREVIEW): elevated high-risk share from the placeholder model
+    if (a.highRiskRate >= 0.2 && a.count >= 4) {
+      signals.push({
+        id: `clu-${id}`,
+        kind: "cluster",
+        tag: "preview",
+        color: RISK_TIER_MAP[a.tier].color,
+        title: t("dm.signal.cluster.title"),
+        detail: t("dm.signal.cluster.detail", { city, pct: Math.round(a.highRiskRate * 100) }),
+      });
+    }
+  }
+  signals.sort((s) => (s.kind === "capacity" ? -1 : 1));
 
   return (
     <Panel>
       <PanelHead>
-        <PanelTitle>⚠ {t("dm.alerts.title")}</PanelTitle>
+        <PanelTitle><FiAlertTriangle size={13} /> {t("dm.signal.title")}</PanelTitle>
         <Chip $tone="var(--muted)">
-          <Num>{alerts.length}</Num>
+          <Num>{signals.length}</Num>
         </Chip>
       </PanelHead>
-      {alerts.length === 0 ? (
-        <Empty>{t("dm.alerts.none")}</Empty>
+      {signals.length === 0 ? (
+        <Empty>{t("dm.signal.none")}</Empty>
       ) : (
         <List>
-          {alerts.map((a) => {
-            const city = t(`nodes.${a.cityId}`, { defaultValue: a.cityId });
-            const color = RISK_TIER_MAP[a.severity].color;
-            return (
-              <Item key={a.id} $color={color}>
-                <div className="top">
-                  <Chip $tone={typeTone[a.type]}>{t(`dm.alerts.${a.type}`)}</Chip>
-                  <span className="time">
-                    <Num>{a.time}</Num>
-                  </span>
-                </div>
-                <div className="ttl">{t(a.titleKey)}</div>
-                <div className="detail">{t(a.detailKey, { ...a.params, city })}</div>
-              </Item>
-            );
-          })}
+          {signals.slice(0, 6).map((s) => (
+            <Item key={s.id}>
+              <div className="top">
+                <Chip $tone={s.tag === "modeled" ? "#9dc0ff" : "#fcd34d"}>
+                  {t(`dm.tag.${s.tag}`)}
+                </Chip>
+              </div>
+              <div className="ttl">{s.title}</div>
+              <div className="detail">{s.detail}</div>
+            </Item>
+          ))}
         </List>
       )}
     </Panel>

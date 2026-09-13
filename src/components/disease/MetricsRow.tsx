@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useDisease } from "../../state/DiseaseContext";
-import { headlineMetrics } from "../../data/simulation";
+import { headline } from "../../data/derive";
 
 const Row = styled.div`
   display: grid;
@@ -17,74 +17,87 @@ const Row = styled.div`
   }
 `;
 
-const Card = styled.div<{ $accent: string }>`
+const Card = styled.div`
   position: relative;
   overflow: hidden;
-  padding: 13px 15px 14px;
+  padding: 18px 20px 19px;
   border-radius: var(--radius);
-  background: var(--panel);
+  /* subtle "lit from above" surface — reads crafted, not flat-generated */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0) 42%),
+    var(--panel);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: ${({ $accent }) => $accent};
+  &:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
   }
+
   .lbl {
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
     color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
   }
   .val {
     font-family: var(--font-num);
     font-variant-numeric: tabular-nums;
-    font-weight: 700;
-    font-size: 27px;
-    letter-spacing: -0.5px;
+    font-weight: 600;
+    font-size: 38px;
+    letter-spacing: -1.4px;
     color: var(--ink);
-    margin-top: 5px;
-    line-height: 1.05;
+    margin-top: 12px;
+    line-height: 1;
   }
   .sub {
-    font-size: 10.5px;
-    font-weight: 600;
+    font-size: 11.5px;
+    font-weight: 500;
     color: var(--faint);
-    margin-top: 3px;
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px solid var(--line);
   }
 `;
 
-const compact = (n: number): string => {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return `${Math.round(n)}`;
-};
+const Tag = styled.span`
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fcd34d;
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 999px;
+  padding: 1px 6px;
+`;
 
 const MetricsRow: React.FC = () => {
   const { t } = useTranslation();
-  const { sim, index } = useDisease();
-  const m = headlineMetrics(sim, index);
+  const { filtered } = useDisease();
+  const m = headline(filtered);
 
   const cards = [
-    { lbl: t("dm.metrics.screenings"), val: compact(m.screenings), sub: t("dm.metrics.period"), accent: "var(--signal)" },
-    { lbl: t("dm.metrics.highRisk"), val: compact(m.highRiskFlagged), sub: t("dm.metrics.period"), accent: "var(--tier-high)" },
-    { lbl: t("dm.metrics.positivity"), val: `${m.positivityRate}%`, sub: t("dm.metrics.period"), accent: "var(--tier-elevated)" },
-    { lbl: t("dm.metrics.undetected"), val: compact(m.undetectedEstimate), sub: t("dm.metrics.undetectedHint"), accent: "var(--tier-critical)" },
-    { lbl: t("dm.metrics.leadTime"), val: `${m.avgLeadTimeDays}`, sub: t("dm.metrics.days"), accent: "var(--tier-low)" },
+    { lbl: t("dm.metrics.screenings"), val: m.screenings.toLocaleString(), sub: t("dm.metrics.allLocations"), preview: false },
+    { lbl: t("dm.metrics.recent"), val: m.recent.toLocaleString(), sub: t("dm.metrics.recentSub"), preview: false },
+    { lbl: t("dm.metrics.locations"), val: `${m.activeLocations}`, sub: t("dm.metrics.locationsSub"), preview: false },
+    { lbl: t("dm.metrics.highRisk"), val: m.highRisk.toLocaleString(), sub: t("dm.metrics.previewSub"), preview: true },
+    { lbl: t("dm.metrics.positivity"), val: `${Math.round(m.highRiskRate * 100)}%`, sub: t("dm.metrics.previewSub"), preview: true },
   ];
 
   return (
     <Row>
       {cards.map((c) => (
-        <Card key={c.lbl} $accent={c.accent}>
-          <div className="lbl">{c.lbl}</div>
+        <Card key={c.lbl}>
+          <div className="lbl">
+            {c.lbl}
+            {c.preview && <Tag>{t("dm.tag.preview")}</Tag>}
+          </div>
           <div className="val">{c.val}</div>
           <div className="sub">{c.sub}</div>
         </Card>

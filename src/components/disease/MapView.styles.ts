@@ -21,12 +21,12 @@ export const MapCanvas = styled.div`
     box-shadow: none !important;
   }
   .leaflet-control-zoom a {
-    background: rgba(18, 24, 38, 0.9) !important;
+    background: rgba(26, 28, 31, 0.9) !important;
     color: var(--ink) !important;
     border-color: var(--line) !important;
   }
   .leaflet-control-zoom a:hover {
-    background: rgba(34, 211, 238, 0.18) !important;
+    background: rgba(77, 141, 246, 0.18) !important;
   }
 `;
 
@@ -39,7 +39,7 @@ export const FocusBar = styled.div`
   gap: 4px;
   padding: 4px;
   border-radius: 11px;
-  background: rgba(10, 14, 23, 0.82);
+  background: rgba(16, 17, 20, 0.82);
   border: 1px solid var(--line);
   backdrop-filter: blur(8px);
 
@@ -56,9 +56,9 @@ export const FocusBar = styled.div`
 
 export const FocusBtn = styled.button<{ $active?: boolean }>`
   appearance: none;
-  border: 1px solid ${({ $active }) => ($active ? "rgba(34,211,238,0.5)" : "transparent")};
-  background: ${({ $active }) => ($active ? "rgba(34,211,238,0.16)" : "transparent")};
-  color: ${({ $active }) => ($active ? "#a5f3fc" : "var(--muted)")};
+  border: 1px solid ${({ $active }) => ($active ? "rgba(77, 141, 246,0.5)" : "transparent")};
+  background: ${({ $active }) => ($active ? "rgba(77, 141, 246,0.16)" : "transparent")};
+  color: ${({ $active }) => ($active ? "#9dc0ff" : "var(--muted)")};
   font-family: var(--font-ui);
   font-size: 11.5px;
   font-weight: 700;
@@ -91,9 +91,9 @@ export const PrevalenceToggle = styled.button<{ $active: boolean }>`
   font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
-  color: ${({ $active }) => ($active ? "#a5f3fc" : "var(--muted)")};
-  background: rgba(10, 14, 23, 0.82);
-  border: 1px solid ${({ $active }) => ($active ? "rgba(34,211,238,0.5)" : "var(--line)")};
+  color: ${({ $active }) => ($active ? "#9dc0ff" : "var(--muted)")};
+  background: rgba(16, 17, 20, 0.82);
+  border: 1px solid ${({ $active }) => ($active ? "rgba(77, 141, 246,0.5)" : "var(--line)")};
   backdrop-filter: blur(8px);
   transition: all 0.16s ease;
 
@@ -103,12 +103,12 @@ export const PrevalenceToggle = styled.button<{ $active: boolean }>`
     border-radius: 50%;
     background: ${({ $active }) =>
       $active
-        ? "linear-gradient(90deg,#22d3ee,#ef4444)"
+        ? "linear-gradient(90deg,#4d8df6,#ef4444)"
         : "rgba(148,163,184,0.5)"};
   }
   &:hover {
     color: var(--ink);
-    border-color: rgba(34, 211, 238, 0.4);
+    border-color: rgba(77, 141, 246, 0.4);
   }
   [dir="rtl"] & {
     right: auto;
@@ -123,7 +123,7 @@ export const Legend = styled.div`
   z-index: 500;
   padding: 11px 13px;
   border-radius: 12px;
-  background: rgba(10, 14, 23, 0.85);
+  background: rgba(16, 17, 20, 0.85);
   border: 1px solid var(--line);
   backdrop-filter: blur(10px);
   max-width: 240px;
@@ -185,15 +185,15 @@ export const LegendRow = styled.div`
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: #38bdf8;
+    background: #4d8df6;
     border: 2px solid #0a0e17;
-    box-shadow: 0 0 0 1.5px #38bdf8;
+    box-shadow: 0 0 0 1.5px #4d8df6;
   }
   .ring {
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    border: 2px dashed #38bdf8;
+    border: 2px dashed #4d8df6;
   }
   .pulse {
     width: 13px;
