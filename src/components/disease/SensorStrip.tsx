@@ -6,7 +6,7 @@ import { headline } from "../../data/derive";
 import { FOCUS_LOCATIONS } from "../../data/submissions";
 import { NODE_MAP } from "../../data/geo";
 import { AIR_QUALITY_API } from "../../data/config";
-import { Panel, PanelHead, PanelTitle, LiveDot, Chip } from "../../styles/cc";
+import { Panel, PanelHead, PanelTitle, LiveDot } from "../../styles/cc";
 
 const Strip = styled.div`
   display: grid;
