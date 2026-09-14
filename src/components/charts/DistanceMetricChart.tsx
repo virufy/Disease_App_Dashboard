@@ -98,7 +98,6 @@ const DistanceMetricChart: React.FC<DistanceMetricChartProps> = ({
 
   const renderCustomizedTick = (props: any) => {
     const { x, y, payload } = props;
-    const dx = isRTL ? 15 : 0;
     return (
       <g transform={`translate(${x},${y})`}>
         <text

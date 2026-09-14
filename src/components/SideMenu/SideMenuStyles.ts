@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import virufyLogo from "../../assets/images/virufyLogo.png";
 import qrCode from "../../assets/images/qrcode.png";
 

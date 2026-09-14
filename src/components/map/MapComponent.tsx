@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.heat";
-import { MapContainer } from "../../styles/DashboardStyles";
 
 interface MapProps {
   lat: number;
@@ -42,6 +41,7 @@ const MapComponent: React.FC<MapProps> = React.memo(
         mapRef.current?.remove();
         mapRef.current = null;
       };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // 👈 RUN ONCE
 
     // ✅ 2. Move map when location changes
