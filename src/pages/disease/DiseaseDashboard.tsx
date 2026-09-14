@@ -9,6 +9,7 @@ import MapView from "../../components/disease/MapView";
 import AlertsPanel from "../../components/disease/AlertsPanel";
 import LiveFeed from "../../components/disease/LiveFeed";
 import { ModeledPanel } from "../../components/disease/ControlsPanel";
+import QRCard from "../../components/disease/QRCard";
 import Timeline from "../../components/disease/Timeline";
 import BottomTabs from "../../components/disease/BottomTabs";
 
@@ -49,6 +50,7 @@ const DiseaseDashboard: React.FC = () => {
           <AlertsPanel />
           <LiveFeed />
           <ModeledPanel />
+          <QRCard />
         </Rail>
       </Main>
 

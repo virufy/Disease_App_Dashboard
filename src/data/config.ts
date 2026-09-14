@@ -15,6 +15,14 @@ export const IS_TEST_DATA = DATA_MODE !== "live";
 
 export const WS_URL = process.env.REACT_APP_WEBSOCKET_URL?.trim() || "";
 
+/**
+ * Public link to the Virufy disease/cough-screening app that the QR code opens.
+ * Must match the URL encoded in the QR image (src/assets/images/disease-app-qr.png).
+ * Override per-environment with REACT_APP_APP_URL in .env.
+ */
+export const APP_URL =
+  process.env.REACT_APP_APP_URL?.trim() || "https://virufy.org/disease-app";
+
 /** Open-Meteo — free, keyless environmental data (labeled with source in UI). */
 export const AIR_QUALITY_API = "https://air-quality-api.open-meteo.com/v1/air-quality";
 export const WEATHER_API = "https://api.open-meteo.com/v1/forecast";

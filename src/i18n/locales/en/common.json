@@ -26,6 +26,11 @@
     "header": {
       "submissions": "submissions"
     },
+    "qr": {
+      "title": "Get the Virufy App",
+      "subtitle": "Scan to screen your cough and contribute data",
+      "hint": "Scan with your phone camera, or tap to open"
+    },
     "status": {
       "live": "connected",
       "connecting": "connecting…",
