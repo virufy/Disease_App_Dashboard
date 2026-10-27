@@ -25,7 +25,6 @@
     "location": "Location",
     "loadingSymptoms": "Loading symptoms",
     "locations": {
-      "siliconValley": "Silicon Valley",
       "dubai": "Dubai"
     }
   },

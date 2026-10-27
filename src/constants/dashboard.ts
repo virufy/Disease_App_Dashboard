@@ -2,12 +2,6 @@ export const MEAN = 2.170383376216376;
 export const STD_DEV = 2;
 
 export const LOCATIONS = {
-  siliconValley: {
-    key: "siliconValley",  // use key for translation
-    lat: 37.3382,
-    lon: -121.8863,
-    zoom: 10,
-  },
   dubai: {
     key: "dubai",
     lat: 25.2048,

@@ -36,12 +36,6 @@ export const filterHealthData = (
 		LocationKey,
 		{ minLat: number; maxLat: number; minLng: number; maxLng: number }
 	> = {
-		siliconValley: {
-			minLat: 36.9,
-			maxLat: 37.8,
-			minLng: -122.5,
-			maxLng: -121.3
-		},
 		dubai: { minLat: 24.8, maxLat: 25.6, minLng: 54.8, maxLng: 55.8 }
 	};
 
@@ -171,7 +165,7 @@ const processGenderSicknessData = (healthData: HealthDataEntry[]) => {
 const Dashboard: React.FC = () => {
 	const [healthData, setHealthData] = useState<HealthDataEntry[]>([]);
 	const [selectedLocation, setSelectedLocation] =
-		useState<LocationKey>("siliconValley");
+		useState<LocationKey>("dubai");
 	const [loadingSymptoms, setLoadingSymptoms] = useState(true);
 	const [symptomsList, setSymptomsList] = useState<Symptom[]>([]);
 	const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
