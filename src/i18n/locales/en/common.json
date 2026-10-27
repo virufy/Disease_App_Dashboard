@@ -12,7 +12,7 @@
   "nodes": {
     "madinah": "Madinah",
     "mecca": "Mecca",
-    "jeddah": "Jeddah (Gateway)",
+    "jeddah": "Jeddah",
     "other": "Other regions"
   },
   "dm": {

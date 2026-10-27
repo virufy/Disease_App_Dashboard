@@ -50,7 +50,7 @@ export const NODES: MapNode[] = [
   { id: "mecca-mina", cityId: "mecca", name: "Mina Screening Camp", kind: "site", lat: 21.413, lon: 39.893, weight: 0.85 },
 
   // ── Jeddah (gateway feeding Mecca & Madinah) ─────────────────
-  { id: "jeddah", cityId: "jeddah", name: "Jeddah (Gateway)", kind: "gateway", lat: 21.4858, lon: 39.1925, weight: 0.9 },
+  { id: "jeddah", cityId: "jeddah", name: "Jeddah", kind: "gateway", lat: 21.4858, lon: 39.1925, weight: 0.9 },
   { id: "jeddah-jed", cityId: "jeddah", name: "King Abdulaziz Airport (JED)", kind: "gateway", lat: 21.6805, lon: 39.1565, weight: 0.9 },
 ];
 
