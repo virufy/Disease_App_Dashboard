@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { FiSmartphone } from "react-icons/fi";
 import { Panel, PanelHead, PanelTitle } from "../../styles/cc";
+import { QRCodeSVG } from "qrcode.react";
 import { APP_URL } from "../../data/config";
-import appQr from "../../assets/images/disease-app-qr.png";
 
 const Body = styled.div`
   display: flex;
@@ -14,9 +14,9 @@ const Body = styled.div`
 `;
 const QrFrame = styled.a`
   flex-shrink: 0;
-  width: 96px;
-  height: 96px;
-  padding: 7px;
+  width: 160px;
+  height: 160px;
+  padding: 8px;
   border-radius: 12px;
   background: #fff;
   border: 1px solid var(--line);
@@ -24,11 +24,10 @@ const QrFrame = styled.a`
   place-items: center;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  img {
+  svg {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: contain;
   }
   &:hover {
     transform: translateY(-1px);
@@ -74,7 +73,15 @@ const QRCard: React.FC = () => {
           aria-label={t("dm.qr.title")}
           title={t("dm.qr.title")}
         >
-          <img src={appQr} alt={t("dm.qr.title")} />
+          <QRCodeSVG
+            value={APP_URL}
+            size={160}
+            level="M"
+            bgColor="#ffffff"
+            fgColor="#000000"
+            role="img"
+            aria-label={t("dm.qr.title")}
+          />
         </QrFrame>
         <Copy>
           <div className="sub">{t("dm.qr.subtitle")}</div>
