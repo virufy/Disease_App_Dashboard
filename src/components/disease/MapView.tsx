@@ -34,10 +34,9 @@ const MapView: React.FC = () => {
   const prevLenRef = useRef(0);
   const [mapReady, setMapReady] = useState<L.Map | null>(null);
 
-  // default framing = the populated Gulf/Hijaz cluster (Dubai, Madinah, Mecca);
-  // Silicon Valley is far away and reachable by selecting it in the filter bar.
+  // default framing = the KSA Hijaz cluster (Madinah, Mecca, Jeddah).
   const allBounds = L.latLngBounds(
-    ["dubai", "madinah", "mecca"].map((id) => [NODE_MAP[id].lat, NODE_MAP[id].lon] as [number, number]),
+    ["madinah", "mecca", "jeddah"].map((id) => [NODE_MAP[id].lat, NODE_MAP[id].lon] as [number, number]),
   );
 
   // init once
@@ -180,7 +179,7 @@ const MapView: React.FC = () => {
   const agg = aggregateByLocation(filtered);
   const intensity = Math.min(
     1,
-    ["dubai", "madinah", "mecca"].reduce((s, id) => s + (agg[id]?.count ?? 0), 0) / 120,
+    ["madinah", "mecca", "jeddah"].reduce((s, id) => s + (agg[id]?.count ?? 0), 0) / 120,
   );
 
   return (

@@ -27,7 +27,7 @@ export interface Submission {
   sex: string;
   ageGroup: string;
   distanceMetric: number | null;
-  /** nearest focus city id, or "other" if far from all four */
+  /** nearest focus city id, or "other" if far from all three */
   locationId: string;
   /** order received over the socket — our session timeline */
   arrivalIndex: number;
@@ -36,7 +36,7 @@ export interface Submission {
 }
 
 /** Focus locations submissions are bucketed to (nearest within radius). */
-export const FOCUS_LOCATIONS = ["siliconValley", "dubai", "madinah", "mecca"] as const;
+export const FOCUS_LOCATIONS = ["madinah", "mecca", "jeddah"] as const;
 export type FocusLocationId = (typeof FOCUS_LOCATIONS)[number] | "other";
 
 const R = 6371; // km

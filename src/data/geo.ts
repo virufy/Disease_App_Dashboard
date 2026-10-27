@@ -1,10 +1,9 @@
 /**
- * REAL geography for the Disease Map.
+ * REAL geography for the Disease Map (Saudi Arabia / KSA focus).
  *
- * Coordinates are accurate. Cities: Dubai (UAE), Madinah & Mecca (KSA).
+ * Coordinates are accurate. Cities: Madinah & Mecca (KSA mass-gathering sites).
  * Jeddah is included as the air/road GATEWAY that feeds pilgrims into Mecca and
- * Madinah; Dubai is the regional transit hub. Sites are real hospitals /
- * screening locations near each city center.
+ * Madinah. Sites are real hospitals / screening locations near each city center.
  */
 
 import { CityMeta, Corridor, MapNode, RiskTierMeta, RiskTier } from "./types";
@@ -32,26 +31,12 @@ export const tierForValue = (value: number): RiskTier => {
 };
 
 export const CITIES: CityMeta[] = [
-  { id: "siliconValley", name: "Silicon Valley", country: "USA", population: 2000000 },
-  { id: "dubai", name: "Dubai", country: "UAE", population: 3600000 },
   { id: "madinah", name: "Madinah", country: "KSA", population: 1500000 },
   { id: "mecca", name: "Mecca", country: "KSA", population: 2000000 },
   { id: "jeddah", name: "Jeddah", country: "KSA", population: 4700000 },
 ];
 
 export const NODES: MapNode[] = [
-  // ── Silicon Valley (USA — Virufy's home base) ────────────────
-  { id: "siliconValley", cityId: "siliconValley", name: "Silicon Valley", kind: "city", lat: 37.3382, lon: -121.8863, weight: 1 },
-  { id: "sv-stanford", cityId: "siliconValley", name: "Stanford Health Care", kind: "site", lat: 37.4331, lon: -122.1754, weight: 0.75 },
-  { id: "sv-scvmc", cityId: "siliconValley", name: "Santa Clara Valley Med Center", kind: "site", lat: 37.3126, lon: -121.9757, weight: 0.7 },
-  { id: "sv-sjc", cityId: "siliconValley", name: "San José Airport (SJC)", kind: "gateway", lat: 37.3639, lon: -121.9289, weight: 0.7 },
-
-  // ── Dubai (regional transit hub) ─────────────────────────────
-  { id: "dubai", cityId: "dubai", name: "Dubai", kind: "city", lat: 25.2048, lon: 55.2708, weight: 1 },
-  { id: "dubai-dxb", cityId: "dubai", name: "Dubai Intl Airport (DXB)", kind: "gateway", lat: 25.2532, lon: 55.3657, weight: 0.9 },
-  { id: "dubai-rashid", cityId: "dubai", name: "Rashid Hospital", kind: "site", lat: 25.235, lon: 55.327, weight: 0.7 },
-  { id: "dubai-mediclinic", cityId: "dubai", name: "Mediclinic City Hospital", kind: "site", lat: 25.232, lon: 55.323, weight: 0.6 },
-
   // ── Madinah (mass-gathering: Umrah/Hajj) ─────────────────────
   { id: "madinah", cityId: "madinah", name: "Madinah", kind: "city", lat: 24.4686, lon: 39.6142, weight: 1 },
   { id: "madinah-mosque", cityId: "madinah", name: "Al-Masjid an-Nabawi", kind: "site", lat: 24.4672, lon: 39.6111, weight: 0.95 },
@@ -84,12 +69,7 @@ export const CORRIDORS: Corridor[] = [
   { id: "jed-madinah", from: "jeddah-jed", to: "madinah", mode: "road", risk: "high" },
   // Mecca ↔ Madinah (pilgrims move between both)
   { id: "mecca-madinah", from: "mecca", to: "madinah", mode: "road", risk: "high" },
-  // Dubai transit hub → gateways
-  { id: "dubai-jed", from: "dubai-dxb", to: "jeddah-jed", mode: "air", risk: "high" },
-  { id: "dubai-madinah", from: "dubai-dxb", to: "madinah-airport", mode: "air", risk: "alternate" },
-  // Silicon Valley ↔ Dubai (long-haul transit link)
-  { id: "sv-dubai", from: "sv-sjc", to: "dubai-dxb", mode: "air", risk: "alternate" },
 ];
 
-/** Center + zoom that frames all three cities on first paint. */
-export const MAP_VIEW = { lat: 23.4, lon: 45.5, zoom: 6 };
+/** Center + zoom that frames Madinah, Mecca and Jeddah on first paint. */
+export const MAP_VIEW = { lat: 22.9, lon: 39.5, zoom: 7 };

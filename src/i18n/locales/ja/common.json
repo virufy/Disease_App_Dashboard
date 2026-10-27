@@ -35,8 +35,6 @@
     "awaitingTitle": "この地域のライブデータを待機中",
     "awaitingHint": "提出データが届き次第、グラフは自動的に更新されます。別の都市も選択できます。",
     "locations": {
-      "siliconValley": "シリコンバレー",
-      "dubai": "ドバイ",
       "madinah": "マディーナ"
     },
     "kpi": {
